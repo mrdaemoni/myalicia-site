@@ -1,0 +1,217 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="FAQ — My Alicia">
+  <h1>FAQ</h1>
+  <p class="lede">
+    Setup, technical, and practical questions. If yours isn't here,
+    <a href="https://github.com/mrdaemoni/myalicia/issues">open an issue on GitHub</a>.
+  </p>
+
+  <h2>Getting started</h2>
+
+  <h3>What is My Alicia?</h3>
+  <p>
+    An open-source pattern for building an AI teammate that grows
+    into the shape of one specific person. Not a chatbot anyone can
+    use — a relationship one person deepens over time. The
+    architecture is three loops (Listen / Notice / Know) over a
+    shared memory substrate, typically an Obsidian vault. See
+    <a href="/philosophy">Philosophy</a> for the framing and
+    <a href="/architecture">Architecture</a> for how it's built.
+  </p>
+
+  <h3>What's the fastest way to try it?</h3>
+  <pre style="background: var(--bg-soft); padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.9rem;">
+git clone https://github.com/mrdaemoni/myalicia.git
+cd myalicia
+pip install -e .
+myalicia init
+</pre>
+  <p>
+    The <code>init</code> flow takes about 5 minutes and walks you
+    through configuration while explaining the three loops.
+  </p>
+
+  <h3>Why isn't <code>pip install myalicia</code> working?</h3>
+  <p>
+    v0.1.0 isn't on PyPI yet. The package skeleton, all 80 skill
+    modules, the configuration layer, and the docs are public, but
+    the legacy 7,951-line <code>alicia.py</code> runtime is still
+    being incrementally split into <code>core/</code> modules. Until
+    v0.2 lands the runtime split, source-install is the supported
+    path.
+  </p>
+
+  <h3>How long does setup take?</h3>
+  <p>
+    About 15 minutes the first time, mostly making decisions (which
+    archetype, which surface, which folders). Subsequent setups on
+    additional machines take about 2 minutes because your config
+    follows you in <code>~/.alicia/config.yaml</code>.
+  </p>
+
+  <hr class="rule" />
+
+  <h2>Minimum requirements</h2>
+
+  <h3>What do I need on my machine?</h3>
+  <ul>
+    <li><strong>Python 3.10 or newer</strong> (3.12 recommended)</li>
+    <li><strong>Disk</strong>: ~50 MB for the package + dependencies, plus your vault (yours, not ours)</li>
+    <li><strong>RAM</strong>: 1–2 GB headroom while running. Voice features and vector search push higher.</li>
+    <li><strong>Network</strong>: Anthropic API access. Telegram if you use that surface.</li>
+  </ul>
+  <p>
+    No GPU. No Docker required. No external database.
+  </p>
+
+  <h3>Does it work on Windows / Linux / Mac?</h3>
+  <p>
+    Yes to all three. macOS uses launchd; Linux uses systemd; Windows
+    runs as a regular Python process or a scheduled task. For
+    platform-agnostic deploys, the repo includes a Docker setup.
+    Examples for all four are in <a href="https://github.com/mrdaemoni/myalicia/tree/main/examples/deployments">examples/deployments/</a>.
+  </p>
+
+  <h3>Do I need an Obsidian vault?</h3>
+  <p>
+    Recommended but not required. My Alicia treats the vault as a
+    folder of markdown files — Obsidian just happens to use the same
+    shape. If you don't want to install Obsidian, point
+    <code>config.vault.root</code> at any folder of <code>.md</code>
+    files and she'll create the <code>Alicia/</code> subfolders on
+    first run.
+  </p>
+
+  <hr class="rule" />
+
+  <h2>Open source / freedom</h2>
+
+  <h3>Is this really open source?</h3>
+  <p>
+    Yes. <strong>MIT licensed.</strong> Fork it, modify it, sell
+    products built on it, contribute back, or never speak to us
+    again. No catch.
+  </p>
+
+  <h3>Can I use it commercially?</h3>
+  <p>
+    Yes. MIT permits commercial use without restriction.
+  </p>
+
+  <h3>Can I run it offline?</h3>
+  <p>
+    Partially out of the box (the orchestration is local; the
+    language model calls go to Anthropic's API). Fully offline once
+    you swap in a local model client (Ollama, llama.cpp, etc.) — the
+    skill logic doesn't care which model serves it. That swap is a
+    welcome community contribution path.
+  </p>
+
+  <h3>Is my data sent anywhere?</h3>
+  <p>
+    Your conversations and the relevant context built for each one
+    are sent to Anthropic's API for inference. <strong>Your vault,
+    memory files, and configuration stay local on your machine</strong>
+    unless you explicitly add a skill that uploads them somewhere.
+    No telemetry. No analytics. Your install is your install.
+  </p>
+
+  <hr class="rule" />
+
+  <h2>Telegram bot setup</h2>
+
+  <h3>How do I create a Telegram bot?</h3>
+  <ol>
+    <li>Open Telegram, search for <strong>@BotFather</strong>, start a conversation.</li>
+    <li>Send <code>/newbot</code>. BotFather asks for a name and a username (must end in <code>bot</code>).</li>
+    <li>BotFather replies with a token like <code>123456789:AAH...</code> — copy this; you only see it once.</li>
+    <li>Set the token: <code>export TELEGRAM_BOT_TOKEN='123456789:AAH...'</code></li>
+    <li>Find your new bot in Telegram and send it any message (this registers your chat).</li>
+  </ol>
+  <p>
+    Then add your chat ID to <code>~/.alicia/config.yaml</code> under
+    <code>surfaces.telegram.allowed_chat_ids</code> — see the FAQ in
+    the repo for how to find your chat ID programmatically.
+  </p>
+
+  <h3>Why Telegram and not WhatsApp / iMessage?</h3>
+  <p>
+    Telegram has a free, stable bot API that any developer can use
+    without app-store review or paid tiers. WhatsApp and iMessage
+    have either no public bot APIs or business-approval friction.
+    The pattern is the same regardless — see
+    <a href="https://github.com/mrdaemoni/myalicia/tree/main/myalicia/surfaces">myalicia/surfaces/</a>
+    for adapter stubs and contribution guidance for your platform.
+  </p>
+
+  <hr class="rule" />
+
+  <h2>Cost</h2>
+
+  <h3>How much does it cost to run?</h3>
+  <p>
+    <strong>Cheap by default.</strong> The three loops use different
+    model tiers:
+  </p>
+  <ul>
+    <li><strong>Listen</strong>: Haiku — pennies per day for normal use</li>
+    <li><strong>Notice</strong>: Sonnet — a few dollars per month</li>
+    <li><strong>Know</strong>: Opus — maybe $5–10 per month if you let it run weekly on a full vault</li>
+  </ul>
+  <p>
+    Realistic monthly cost for a steady user: <strong>$10–20 per month.</strong>
+    You can dial down by switching loops to cheaper models in
+    <code>config.yaml</code>, or disabling Notice/Know entirely.
+  </p>
+
+  <h3>Where do I get an Anthropic API key?</h3>
+  <p>
+    Sign up at <a href="https://console.anthropic.com">console.anthropic.com</a>.
+    New accounts get free credits. Set it as <code>ANTHROPIC_API_KEY</code>
+    in your environment.
+  </p>
+
+  <h3>Can I limit my spending?</h3>
+  <p>
+    Yes — three ways:
+  </p>
+  <ol>
+    <li><strong>Anthropic console</strong>: hard monthly spend cap on the API key</li>
+    <li><strong>Disable loops</strong>: set <code>loops.notice_enabled: false</code> to keep only the cheap Listen loop</li>
+    <li><strong>Downgrade models</strong>: set <code>models.know: claude-sonnet-4-6</code> instead of Opus</li>
+  </ol>
+
+  <hr class="rule" />
+
+  <h2>Customization & contribution</h2>
+
+  <h3>How do I change Alicia's voice / personality?</h3>
+  <p>
+    Edit your archetype. Default is <code>curious-builder</code>. Pick
+    a different one (<code>patient-mentor</code>, <code>ariadne</code>),
+    or copy a YAML file and write your own. Configuration in
+    <code>~/.alicia/config.yaml</code>.
+  </p>
+
+  <h3>Can I add my own skills?</h3>
+  <p>
+    Yes — that's the contribution surface we're most excited about.
+    See <a href="https://github.com/mrdaemoni/myalicia/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+    for the awareness-primitive pattern. Designers and builders
+    welcome.
+  </p>
+
+  <hr class="rule" />
+
+  <h2>Where to find more</h2>
+
+  <p>
+    The full FAQ — including troubleshooting, vault customization,
+    and detailed setup gotchas — lives in the repo at
+    <a href="https://github.com/mrdaemoni/myalicia/blob/main/docs/FAQ.md">docs/FAQ.md</a>.
+    The intellectual lineage (papers and frameworks Alicia draws
+    from) is at <a href="/papers">Papers</a>.
+  </p>
+</Base>

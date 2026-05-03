@@ -1,0 +1,184 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Papers & Ideas — My Alicia">
+  <h1>Papers & Ideas Alicia Draws From</h1>
+  <p class="lede">
+    My Alicia stands on the shoulders of researchers, designers, and
+    frameworks that saw something the rest of us hadn't yet. This
+    page lists the papers, concepts, and intellectual foundations
+    that shaped the project.
+  </p>
+
+  <p>
+    Where evidence in the codebase is direct, the connection is
+    cited explicitly. Where the influence is broader, that's noted
+    too. The full version with longer "how myalicia uses it"
+    descriptions is in the repo at <a href="https://github.com/mrdaemoni/myalicia/blob/main/docs/PAPERS.md">docs/PAPERS.md</a>.
+  </p>
+
+  <hr class="rule" />
+
+  <h2>Foundational</h2>
+
+  <h3>Humorphism</h3>
+  <p>
+    <strong>Source:</strong> <a href="https://humorphism.com">humorphism.com</a>
+  </p>
+  <p>
+    The design philosophy that technology should take the shape of
+    the human, not the other way around. Stop building chatbots
+    everyone learns to talk to; start designing relationships that
+    learn the person they're with. The entire three-loop architecture
+    is humorphism made buildable.
+  </p>
+
+  <h3>Thin Harness, Fat Skills</h3>
+  <p>
+    <strong>Source:</strong> <a href="https://x.com/garrytan">Garry Tan</a>
+  </p>
+  <p>
+    Architectural pattern for agent design: a small, opinionated
+    orchestration core surrounded by many composable skill modules.
+    Visible in the folder structure: <code>myalicia/core/</code> stays
+    tiny while <code>myalicia/skills/</code> holds ~80 modules. The
+    core stays out of the way so the skills can be where the
+    personality lives.
+  </p>
+
+  <h3>Autoresearch</h3>
+  <p>
+    <strong>Source:</strong> <a href="https://x.com/karpathy">Andrej Karpathy</a>
+  </p>
+  <p>
+    The pattern of autonomous research loops where an agent runs
+    reflection and synthesis on its own, without human prompting.
+    The Notice and Know loops are myalicia's local, personal,
+    single-user version of autoresearch — synthesis runs while you
+    sleep, novelty detection on conversations, weekly deep passes
+    over the full vault.
+  </p>
+
+  <hr class="rule" />
+
+  <h2>Module-Level Frameworks</h2>
+
+  <p>
+    Papers that name or directly shape specific skill modules.
+  </p>
+
+  <h3>Reflexion (Shinn et al., 2023)</h3>
+  <p>
+    <em>"Reflexion: Language Agents with Verbal Reinforcement Learning"</em>
+  </p>
+  <p>
+    Agents critique themselves after tasks and store linguistic
+    feedback for future episodes. Implemented in
+    <code>reflexion.py</code> and <code>meta_reflexion.py</code>.
+  </p>
+
+  <h3>Constitutional AI (Bai et al., 2022, Anthropic)</h3>
+  <p>
+    Self-criticism and revision against a set of principles.
+    Implemented in <code>constitution.py</code> — outputs are scored
+    against an evolving constitution before being acted on.
+  </p>
+
+  <h3>Generative Agents (Park et al., Stanford 2023)</h3>
+  <p>
+    Multi-timescale reflection loops in agent architectures.
+    The three-cadence design (Listen / Notice / Know) draws on this
+    work's insight that agents need different reflection horizons to
+    behave consistently over time.
+  </p>
+
+  <h3>Memento-Skills</h3>
+  <p>
+    Agents that draft new skills from observed failures. Implemented
+    in <code>skill_author.py</code> — when My Alicia notices a gap in
+    her own behavior, she can author a new skill module to handle it.
+  </p>
+
+  <h3>SSGM — Self-Stabilizing Guarded Memory</h3>
+  <p>
+    Guardrails for evolving memory systems that can drift over time.
+    Implemented in <code>memory_audit.py</code> — periodic checks on
+    memory consistency and drift detection.
+  </p>
+
+  <h3>MemRL — Memory-Reinforced Learning</h3>
+  <p>
+    Reinforcement learning over episodic memory. Implemented in
+    <code>episode_scorer.py</code> — episodes are scored to
+    influence which memories get retrieved in future contexts.
+  </p>
+
+  <h3>Hyperagents</h3>
+  <p>
+    Meta-agents that improve themselves recursively. Implemented in
+    <code>meta_reflexion.py</code> and the <code>self_improve</code>
+    family — the system reflects on its own reflection.
+  </p>
+
+  <h3>TIMG — Trajectory-Informed Method Generalization</h3>
+  <p>
+    Decision-level attribution through agent trajectories. Implemented
+    in <code>trajectory.py</code> — every action is recorded with its
+    triggering context for later analysis.
+  </p>
+
+  <hr class="rule" />
+
+  <h2>Background Influence</h2>
+
+  <p>
+    Ideas that shaped the project's worldview but aren't directly
+    cited in the code.
+  </p>
+
+  <h3>ReAct (Yao et al., 2023)</h3>
+  <p>
+    Interleaving reasoning traces and acting. The handle_message
+    pipeline mirrors this pattern — every message routes through
+    reasoning steps before any tool is called.
+  </p>
+
+  <h3>Wise Machines (Johnson, Stanford 2024)</h3>
+  <p>
+    Five dimensions of wisdom in AI systems. Inspired the
+    metacognition engine's confidence assessment with multiple
+    independent dimensions of self-evaluation.
+  </p>
+
+  <h3>Intrinsic Motivation in Agents</h3>
+  <p>
+    Curiosity-driven exploration research (Schmidhuber and others).
+    The <code>curiosity_engine.py</code> uses three novelty signals
+    derived from this tradition.
+  </p>
+
+  <h3>Knowledge Graph Completion</h3>
+  <p>
+    Graph-theoretic approaches to surfacing missing relationships.
+    Used in <code>graph_intelligence.py</code> for vault structure
+    optimization and link prediction.
+  </p>
+
+  <hr class="rule" />
+
+  <h2>Caveat</h2>
+
+  <p>
+    The lineage above is honest but partial. As the project grows
+    and contributors add awareness primitives drawing on different
+    traditions, this page will grow. If you see a connection we
+    should add (or a citation we got wrong),
+    <a href="https://github.com/mrdaemoni/myalicia/issues">open an issue</a>.
+  </p>
+
+  <p>
+    For more on the specific implementation of each, the source
+    code's docstrings are often the clearest reference — most skill
+    modules cite the work that inspired them at the top.
+  </p>
+</Base>
