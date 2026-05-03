@@ -1,0 +1,58 @@
+---
+// Knowledge altitudes — how knowledge metabolizes upward in My Alicia,
+// with external research keeping the loop open.
+---
+<svg viewBox="0 0 760 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="alt-title alt-desc">
+  <title id="alt-title">Knowledge altitudes</title>
+  <desc id="alt-desc">Three altitudes of knowledge — inputs at the bottom, synthesis in the middle, wisdom at the top. Knowledge compounds upward. External research feeds into synthesis from outside.</desc>
+  <style>
+    .band { fill: var(--bg-soft, #f3f1ec); stroke: var(--rule, #e6e3dc); stroke-width: 1; }
+    .band-label { font: 600 14px ui-sans-serif, system-ui, sans-serif; fill: var(--ink, #1a1a1a); text-anchor: middle; letter-spacing: 0.04em; }
+    .band-sub { font: 11px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft, #555550); text-anchor: middle; }
+    .arrow { stroke: var(--accent, #d97757); stroke-width: 1.5; fill: none; }
+    .arrow-soft { stroke: var(--accent, #d97757); stroke-width: 1.2; fill: none; stroke-opacity: 0.55; stroke-dasharray: 3 3; }
+    .ext-label { font: 600 12px ui-sans-serif, system-ui, sans-serif; fill: var(--ink, #1a1a1a); text-anchor: start; }
+    .ext-sub { font: 11px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft, #555550); text-anchor: start; }
+    .caption { font: 12px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft, #555550); text-anchor: middle; font-style: italic; }
+  </style>
+
+  <!-- Top band: WISDOM -->
+  <rect class="band" x="180" y="40" width="400" height="80" rx="6" />
+  <text class="band-label" x="380" y="75">WISDOM</text>
+  <text class="band-sub" x="380" y="95">deep topics · provocations · drawings · insights</text>
+
+  <!-- Up-arrow between WISDOM and SYNTHESIS -->
+  <path class="arrow" d="M 380 130 L 380 158" marker-end="url(#alt-up)" />
+
+  <!-- Mid band: SYNTHESIS -->
+  <rect class="band" x="180" y="170" width="400" height="80" rx="6" />
+  <text class="band-label" x="380" y="205">SYNTHESIS</text>
+  <text class="band-sub" x="380" y="225">patterns · connections · weekly summaries · bridges</text>
+
+  <!-- Up-arrow between SYNTHESIS and INPUTS -->
+  <path class="arrow" d="M 380 260 L 380 288" marker-end="url(#alt-up)" />
+
+  <!-- Bottom band: INPUTS -->
+  <rect class="band" x="180" y="300" width="400" height="80" rx="6" />
+  <text class="band-label" x="380" y="335">INPUTS</text>
+  <text class="band-sub" x="380" y="355">notes · quotes · voice feedback · conversations</text>
+
+  <!-- External research on the right, feeding into SYNTHESIS -->
+  <path class="arrow-soft" d="M 700 210 L 595 210" marker-end="url(#alt-left)" />
+  <text class="ext-label" x="610" y="180">external</text>
+  <text class="ext-label" x="610" y="196">research</text>
+  <text class="ext-sub" x="610" y="232">new authors</text>
+  <text class="ext-sub" x="610" y="247">new viewpoints</text>
+
+  <!-- Caption -->
+  <text class="caption" x="380" y="430">Knowledge compounds upward. External research keeps the loop open.</text>
+
+  <defs>
+    <marker id="alt-up" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto">
+      <path d="M 0 8 L 4 0 L 8 8 z" fill="var(--accent, #d97757)" />
+    </marker>
+    <marker id="alt-left" markerWidth="8" markerHeight="8" refX="0" refY="4" orient="auto">
+      <path d="M 8 0 L 0 4 L 8 8 z" fill="var(--accent, #d97757)" fill-opacity="0.55" />
+    </marker>
+  </defs>
+</svg>

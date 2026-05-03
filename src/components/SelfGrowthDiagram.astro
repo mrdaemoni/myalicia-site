@@ -1,0 +1,83 @@
+---
+// Self-growth — three parallel mechanisms (heal, extend, aware) by
+// which My Alicia improves with use, all converging into a single
+// teammate that gets sharper over time.
+---
+<svg viewBox="0 0 760 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="grow-title grow-desc">
+  <title id="grow-title">How My Alicia grows</title>
+  <desc id="grow-desc">USE at the top branches into three parallel growth mechanisms — self-healing, self-extending, self-aware — which converge into "every instance grows."</desc>
+  <style>
+    .node { fill: var(--bg-soft, #f3f1ec); stroke: var(--rule, #e6e3dc); stroke-width: 1; }
+    .node-strong { fill: var(--bg-soft, #f3f1ec); stroke: var(--accent, #d97757); stroke-width: 1.5; }
+    .node-label { font: 600 13px ui-sans-serif, system-ui, sans-serif; fill: var(--ink, #1a1a1a); text-anchor: middle; letter-spacing: 0.04em; }
+    .node-sub { font: 11px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft, #555550); text-anchor: middle; }
+    .stage-label { font: 10px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft, #555550); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.08em; }
+    .stage-text { font: 11px ui-sans-serif, system-ui, sans-serif; fill: var(--ink, #1a1a1a); text-anchor: middle; }
+    .arrow { stroke: var(--accent, #d97757); stroke-width: 1.5; fill: none; }
+    .arrow-soft { stroke: var(--accent, #d97757); stroke-width: 1; fill: none; stroke-opacity: 0.5; }
+    .caption { font: 12px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft, #555550); text-anchor: middle; font-style: italic; }
+  </style>
+
+  <!-- USE at top -->
+  <rect class="node" x="305" y="20" width="150" height="50" rx="6" />
+  <text class="node-label" x="380" y="45">USE</text>
+  <text class="node-sub" x="380" y="60">daily relationship</text>
+
+  <!-- Branching arrows from USE down to three columns -->
+  <path class="arrow-soft" d="M 380 80 L 380 95" />
+  <path class="arrow-soft" d="M 130 95 L 630 95" />
+  <path class="arrow" d="M 130 95 L 130 120" marker-end="url(#grow-down)" />
+  <path class="arrow" d="M 380 95 L 380 120" marker-end="url(#grow-down)" />
+  <path class="arrow" d="M 630 95 L 630 120" marker-end="url(#grow-down)" />
+
+  <!-- Column 1: SELF-HEALING -->
+  <rect class="node" x="50" y="130" width="160" height="200" rx="6" />
+  <text class="node-label" x="130" y="155">SELF-HEALING</text>
+  <text class="stage-label" x="130" y="190">trigger</text>
+  <text class="stage-text" x="130" y="207">errors</text>
+  <text class="stage-label" x="130" y="237">action</text>
+  <text class="stage-text" x="130" y="254">log trajectory</text>
+  <text class="stage-label" x="130" y="284">result</text>
+  <text class="stage-text" x="130" y="301">fix in next loop</text>
+
+  <!-- Column 2: SELF-EXTENDING -->
+  <rect class="node" x="300" y="130" width="160" height="200" rx="6" />
+  <text class="node-label" x="380" y="155">SELF-EXTENDING</text>
+  <text class="stage-label" x="380" y="190">trigger</text>
+  <text class="stage-text" x="380" y="207">behavior gap</text>
+  <text class="stage-label" x="380" y="237">action</text>
+  <text class="stage-text" x="380" y="254">research the gap</text>
+  <text class="stage-label" x="380" y="284">result</text>
+  <text class="stage-text" x="380" y="301">new skill authored</text>
+
+  <!-- Column 3: SELF-AWARE -->
+  <rect class="node" x="550" y="130" width="160" height="200" rx="6" />
+  <text class="node-label" x="630" y="155">SELF-AWARE</text>
+  <text class="stage-label" x="630" y="190">trigger</text>
+  <text class="stage-text" x="630" y="207">uncertainty</text>
+  <text class="stage-label" x="630" y="237">action</text>
+  <text class="stage-text" x="630" y="254">confidence check</text>
+  <text class="stage-label" x="630" y="284">result</text>
+  <text class="stage-text" x="630" y="301">model escalation</text>
+
+  <!-- Convergence arrows -->
+  <path class="arrow" d="M 130 340 L 130 360" />
+  <path class="arrow" d="M 380 340 L 380 360" />
+  <path class="arrow" d="M 630 340 L 630 360" />
+  <path class="arrow-soft" d="M 130 360 L 630 360" />
+  <path class="arrow" d="M 380 360 L 380 380" marker-end="url(#grow-down)" />
+
+  <!-- BETTER ALICIA at bottom -->
+  <rect class="node-strong" x="265" y="390" width="230" height="50" rx="6" />
+  <text class="node-label" x="380" y="415">EVERY INSTANCE GROWS</text>
+  <text class="node-sub" x="380" y="431">sharper with each cycle</text>
+
+  <!-- Caption -->
+  <text class="caption" x="380" y="465">Three mechanisms, one teammate, getting better with use.</text>
+
+  <defs>
+    <marker id="grow-down" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto">
+      <path d="M 0 0 L 4 8 L 8 0 z" fill="var(--accent, #d97757)" />
+    </marker>
+  </defs>
+</svg>

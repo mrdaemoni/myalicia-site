@@ -1,13 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
 import LoopsDiagram from '../components/LoopsDiagram.astro';
+import SelfGrowthDiagram from '../components/SelfGrowthDiagram.astro';
 ---
-<Base title="Architecture — myalicia">
+<Base title="Architecture — My Alicia">
   <h1>Architecture</h1>
   <p class="lede">
-    myalicia is a thin core surrounded by composable skills, with three
-    loops running over a shared memory substrate. Cheap by default,
-    expensive by choice.
+    My Alicia is a thin core surrounded by composable skills, with three
+    loops running over a shared memory substrate.
+  </p>
+
+  <p>
+    Alicia's architecture is inspired by many generous thinkers — among
+    them <a href="https://x.com/garrytan">Garry Tan</a> and
+    <a href="https://x.com/karpathy">Andrej Karpathy</a>. Thank you.
   </p>
 
   <h2>The shape of the system</h2>
@@ -20,11 +26,11 @@ import LoopsDiagram from '../components/LoopsDiagram.astro';
   <h2>Thin harness, fat skills</h2>
 
   <p>
-    The architectural pattern comes from <a href="https://github.com/garrytan">Garry Tan</a>:
-    a small, opinionated core that does orchestration and routing, surrounded by
-    many composable skill modules that each do one thing well. The core
-    is intentionally small because the skills are the contribution surface.
-    People should be able to add a skill without understanding the whole system.
+    A small, opinionated core handles orchestration and routing,
+    surrounded by many composable skill modules that each do one thing
+    well. The core is intentionally small because the skills are the
+    contribution surface — people should be able to add a skill without
+    understanding the whole system.
   </p>
 
   <pre style="background: var(--bg-soft); padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.9rem;">
@@ -79,16 +85,21 @@ myalicia/
     Three traits we treat as teammate qualities, not internal plumbing:
   </p>
 
+  <div class="figure">
+    <SelfGrowthDiagram />
+    <p class="caption">How My Alicia improves with each interaction.</p>
+  </div>
+
   <h3>Self-healing</h3>
   <p>
-    When a skill errors, myalicia notices, logs the trajectory, and
+    When a skill errors, My Alicia notices, logs the trajectory, and
     proposes a fix in the next reflection loop. You don't have to
-    babysit it.
+    babysit her.
   </p>
 
   <h3>Self-extending</h3>
   <p>
-    myalicia can author new skills based on observed gaps in her own
+    My Alicia can author new skills based on observed gaps in her own
     behavior. Every instance grows.
   </p>
 
@@ -102,7 +113,7 @@ myalicia/
   <h2>Hybrid surfaces</h2>
 
   <p>
-    Reach myalicia through Telegram (conversational), Claude Code
+    Reach My Alicia through Telegram (conversational), Claude Code
     (technical), or the CLI (anywhere). The same teammate, different
     surface for different parts of your life. Surfaces are pluggable —
     each is a small adapter wrapping the same handle_message pipeline,
