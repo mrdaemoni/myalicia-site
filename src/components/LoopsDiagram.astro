@@ -1,0 +1,65 @@
+---
+// The three relationship loops, rendered as an inline SVG so it stays
+// crisp at any size and ships with no extra requests.
+---
+<svg viewBox="0 0 760 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="loops-title loops-desc">
+  <title id="loops-title">The three relationship loops of myalicia</title>
+  <desc id="loops-desc">Listen, Notice, and Know — three depths of attention that compound over time, sharing a memory substrate, reachable through Telegram and Claude Code surfaces.</desc>
+  <style>
+    .loop { fill: none; stroke-width: 1.5; }
+    .loop-listen { stroke: var(--accent); }
+    .loop-notice { stroke: var(--accent); stroke-opacity: 0.6; stroke-dasharray: 4 4; }
+    .loop-know   { stroke: var(--accent); stroke-opacity: 0.35; stroke-dasharray: 2 6; }
+    .core    { fill: var(--bg-soft); stroke: var(--rule); stroke-width: 1; }
+    .surface { fill: var(--bg); stroke: var(--rule); stroke-width: 1; }
+    .label-loop    { font: 600 14px ui-sans-serif, system-ui, sans-serif; fill: var(--ink); }
+    .label-cadence { font: 11px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft); }
+    .label-core    { font: 600 14px ui-sans-serif, system-ui, sans-serif; fill: var(--ink); text-anchor: middle; }
+    .label-sub     { font: 11px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft); text-anchor: middle; }
+    .label-surface { font: 600 12px ui-sans-serif, system-ui, sans-serif; fill: var(--ink); text-anchor: middle; }
+    .arrow { stroke: var(--rule); stroke-width: 1; fill: none; }
+    .tagline { font: 12px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft); text-anchor: middle; font-style: italic; }
+  </style>
+
+  <ellipse class="loop loop-know"   cx="380" cy="280" rx="320" ry="200" />
+  <ellipse class="loop loop-notice" cx="380" cy="280" rx="230" ry="150" />
+  <ellipse class="loop loop-listen" cx="380" cy="280" rx="140" ry="100" />
+
+  <rect class="core" x="320" y="260" width="120" height="50" rx="6" />
+  <text class="label-core" x="380" y="282">Memory</text>
+  <text class="label-sub" x="380" y="298">vault · notes · archetype</text>
+
+  <text class="label-loop" x="380" y="190" text-anchor="middle">Listen</text>
+  <text class="label-cadence" x="380" y="206" text-anchor="middle">seconds · be present</text>
+
+  <text class="label-loop" x="380" y="140" text-anchor="middle">Notice</text>
+  <text class="label-cadence" x="380" y="156" text-anchor="middle">minutes–hours · catch patterns</text>
+
+  <text class="label-loop" x="380" y="90" text-anchor="middle">Know</text>
+  <text class="label-cadence" x="380" y="106" text-anchor="middle">days–weeks · come to know</text>
+
+  <text class="label-cadence" x="380" y="370" text-anchor="middle">conversation</text>
+  <text class="label-cadence" x="380" y="420" text-anchor="middle">event-triggered synthesis</text>
+  <text class="label-cadence" x="380" y="470" text-anchor="middle">scheduled reflection</text>
+
+  <rect class="surface" x="40" y="260" width="100" height="50" rx="6" />
+  <text class="label-surface" x="90" y="282">Telegram</text>
+  <text class="label-sub" x="90" y="298">conversational</text>
+
+  <rect class="surface" x="620" y="260" width="100" height="50" rx="6" />
+  <text class="label-surface" x="670" y="282">Claude Code</text>
+  <text class="label-sub" x="670" y="298">technical</text>
+
+  <path class="arrow" d="M 140 285 Q 230 285 320 285" marker-end="url(#arrowhead)" />
+  <path class="arrow" d="M 320 290 Q 230 290 140 290" marker-end="url(#arrowhead)" />
+  <path class="arrow" d="M 620 285 Q 530 285 440 285" marker-end="url(#arrowhead)" />
+  <path class="arrow" d="M 440 290 Q 530 290 620 290" marker-end="url(#arrowhead)" />
+
+  <text class="tagline" x="380" y="510">an AI teammate that grows into the shape of the person it serves</text>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--rule)" />
+    </marker>
+  </defs>
+</svg>

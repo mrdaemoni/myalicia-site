@@ -1,0 +1,111 @@
+---
+import Base from '../layouts/Base.astro';
+import LoopsDiagram from '../components/LoopsDiagram.astro';
+---
+<Base title="Architecture — myalicia">
+  <h1>Architecture</h1>
+  <p class="lede">
+    myalicia is a thin core surrounded by composable skills, with three
+    loops running over a shared memory substrate. Cheap by default,
+    expensive by choice.
+  </p>
+
+  <h2>The shape of the system</h2>
+
+  <div class="figure">
+    <LoopsDiagram />
+    <p class="caption">Listen, Notice, Know — three loops, two surfaces, one memory.</p>
+  </div>
+
+  <h2>Thin harness, fat skills</h2>
+
+  <p>
+    The architectural pattern comes from <a href="https://github.com/garrytan">Garry Tan</a>:
+    a small, opinionated core that does orchestration and routing, surrounded by
+    many composable skill modules that each do one thing well. The core
+    is intentionally small because the skills are the contribution surface.
+    People should be able to add a skill without understanding the whole system.
+  </p>
+
+  <pre style="background: var(--bg-soft); padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.9rem;">
+myalicia/
+├── core/           # the thin harness — loops, scheduler, routing, memory
+├── skills/         # the fat skills — ~80 modules, each composable
+├── surfaces/       # telegram, claude_code, cli adapters
+└── config.py       # the single source of truth for personalization
+</pre>
+
+  <h2>The three loops</h2>
+
+  <p>
+    Each loop runs at a different cadence and uses a different model
+    tier. Cheap by default — turn the dial up only where depth matters.
+  </p>
+
+  <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0;">
+    <thead>
+      <tr style="border-bottom: 1px solid var(--rule);">
+        <th style="text-align: left; padding: 0.5rem 0.75rem 0.5rem 0;">Loop</th>
+        <th style="text-align: left; padding: 0.5rem 0.75rem;">Cadence</th>
+        <th style="text-align: left; padding: 0.5rem 0.75rem;">Model</th>
+        <th style="text-align: left; padding: 0.5rem 0;">What it does</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--rule);">
+        <td style="padding: 0.75rem 0.75rem 0.75rem 0;"><strong>Listen</strong></td>
+        <td style="padding: 0.75rem;">seconds</td>
+        <td style="padding: 0.75rem;">Haiku</td>
+        <td style="padding: 0.75rem 0;">conversation, in the moment</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--rule);">
+        <td style="padding: 0.75rem 0.75rem 0.75rem 0;"><strong>Notice</strong></td>
+        <td style="padding: 0.75rem;">minutes–hours</td>
+        <td style="padding: 0.75rem;">Sonnet</td>
+        <td style="padding: 0.75rem 0;">event-triggered synthesis</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.75rem 0.75rem 0.75rem 0;"><strong>Know</strong></td>
+        <td style="padding: 0.75rem;">days–weeks</td>
+        <td style="padding: 0.75rem;">Opus</td>
+        <td style="padding: 0.75rem 0;">scheduled autonomous reflection</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Self-healing, self-extending, self-aware</h2>
+
+  <p>
+    Three traits we treat as teammate qualities, not internal plumbing:
+  </p>
+
+  <h3>Self-healing</h3>
+  <p>
+    When a skill errors, myalicia notices, logs the trajectory, and
+    proposes a fix in the next reflection loop. You don't have to
+    babysit it.
+  </p>
+
+  <h3>Self-extending</h3>
+  <p>
+    myalicia can author new skills based on observed gaps in her own
+    behavior. Every instance grows.
+  </p>
+
+  <h3>Self-aware</h3>
+  <p>
+    Every action runs through metacognitive confidence assessment;
+    uncertain actions escalate to deeper models automatically. The
+    system knows what it doesn't know.
+  </p>
+
+  <h2>Hybrid surfaces</h2>
+
+  <p>
+    Reach myalicia through Telegram (conversational), Claude Code
+    (technical), or the CLI (anywhere). The same teammate, different
+    surface for different parts of your life. Surfaces are pluggable —
+    each is a small adapter wrapping the same handle_message pipeline,
+    so contributors can add Discord, iMessage, voice, or anything else.
+  </p>
+</Base>
