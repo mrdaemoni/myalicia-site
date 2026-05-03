@@ -1,0 +1,86 @@
+---
+// Skill anatomy — what a single skill module looks like inside.
+// Designed for the contributor onboarding section: shows triggers,
+// the substrate connection, processing, effects, and loop placement.
+---
+<svg viewBox="0 0 760 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="anatomy-title anatomy-desc">
+  <title id="anatomy-title">Anatomy of a skill</title>
+  <desc id="anatomy-desc">A skill module has a trigger, reads from the memory substrate, processes, writes effects back, and lives at one of the three loops.</desc>
+  <style>
+    .frame { fill: var(--bg, #fafaf7); }
+    .skill-box { fill: var(--bg-soft, #f3f1ec); stroke: var(--accent, #d97757); stroke-width: 1.5; }
+    .port { fill: var(--bg, #fafaf7); stroke: var(--rule, #e6e3dc); stroke-width: 1; }
+    .substrate { fill: var(--bg-soft, #f3f1ec); stroke: var(--rule, #e6e3dc); stroke-width: 1; stroke-dasharray: 3 3; }
+    .label-title { font: 600 14px ui-sans-serif, system-ui, sans-serif; fill: var(--ink, #1a1a1a); text-anchor: middle; letter-spacing: 0.04em; }
+    .label-port  { font: 600 11px ui-sans-serif, system-ui, sans-serif; fill: var(--ink, #1a1a1a); text-anchor: middle; }
+    .label-text  { font: 11px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft, #555550); text-anchor: middle; }
+    .label-stage { font: 10px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft, #555550); text-anchor: middle; text-transform: uppercase; letter-spacing: 0.08em; }
+    .arrow { stroke: var(--accent, #d97757); stroke-width: 1.5; fill: none; }
+    .arrow-soft { stroke: var(--rule, #e6e3dc); stroke-width: 1.2; fill: none; stroke-dasharray: 2 4; }
+    .caption { font: 12px ui-sans-serif, system-ui, sans-serif; fill: var(--ink-soft, #555550); text-anchor: middle; font-style: italic; }
+  </style>
+
+  <!-- Trigger (top) -->
+  <rect class="port" x="305" y="20" width="150" height="42" rx="6" />
+  <text class="label-port" x="380" y="40">TRIGGER</text>
+  <text class="label-text" x="380" y="55">message · event · schedule</text>
+  <path class="arrow" d="M 380 70 L 380 105" marker-end="url(#anat-arrow)" />
+
+  <!-- Skill box (center) -->
+  <rect class="skill-box" x="180" y="115" width="400" height="220" rx="8" />
+  <text class="label-title" x="380" y="142">SKILL MODULE</text>
+
+  <!-- Stages inside the skill -->
+  <text class="label-stage" x="250" y="175">read</text>
+  <text class="label-text" x="250" y="195">vault</text>
+  <text class="label-text" x="250" y="210">memory</text>
+  <text class="label-text" x="250" y="225">archetype</text>
+
+  <text class="label-stage" x="380" y="175">think</text>
+  <text class="label-text" x="380" y="195">analyze</text>
+  <text class="label-text" x="380" y="210">synthesize</text>
+  <text class="label-text" x="380" y="225">decide</text>
+
+  <text class="label-stage" x="510" y="175">write</text>
+  <text class="label-text" x="510" y="195">response</text>
+  <text class="label-text" x="510" y="210">note</text>
+  <text class="label-text" x="510" y="225">action</text>
+
+  <!-- Inner arrows showing flow -->
+  <path class="arrow-soft" d="M 290 215 L 350 215" />
+  <path class="arrow-soft" d="M 410 215 L 470 215" />
+
+  <!-- Loop placement label inside skill -->
+  <text class="label-stage" x="380" y="280">lives at one loop</text>
+  <text class="label-text" x="380" y="300">Listen · Notice · Know</text>
+
+  <!-- Substrate connections (left + right outside skill) -->
+  <rect class="substrate" x="40" y="180" width="110" height="80" rx="6" />
+  <text class="label-port" x="95" y="205">SUBSTRATE</text>
+  <text class="label-text" x="95" y="225">vault · notes</text>
+  <text class="label-text" x="95" y="240">memory files</text>
+  <text class="label-text" x="95" y="255">archetype</text>
+  <path class="arrow" d="M 155 220 L 215 215" marker-end="url(#anat-arrow)" />
+
+  <rect class="substrate" x="610" y="180" width="110" height="80" rx="6" />
+  <text class="label-port" x="665" y="205">EFFECTS</text>
+  <text class="label-text" x="665" y="225">user reply</text>
+  <text class="label-text" x="665" y="240">vault note</text>
+  <text class="label-text" x="665" y="255">tool call</text>
+  <path class="arrow" d="M 545 215 L 605 220" marker-end="url(#anat-arrow)" />
+
+  <!-- Output (bottom) -->
+  <path class="arrow" d="M 380 345 L 380 380" marker-end="url(#anat-arrow)" />
+  <rect class="port" x="305" y="390" width="150" height="42" rx="6" />
+  <text class="label-port" x="380" y="410">OUTPUT</text>
+  <text class="label-text" x="380" y="425">surface · memory · trigger</text>
+
+  <!-- Caption -->
+  <text class="caption" x="380" y="465">A skill is a small, composable unit of perception. Many skills make a teammate.</text>
+
+  <defs>
+    <marker id="anat-arrow" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto">
+      <path d="M 0 0 L 4 8 L 8 0 z" fill="var(--accent, #d97757)" />
+    </marker>
+  </defs>
+</svg>

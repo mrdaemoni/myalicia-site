@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import LoopsDiagram from '../components/LoopsDiagram.astro';
 import SelfGrowthDiagram from '../components/SelfGrowthDiagram.astro';
+import SkillAnatomyDiagram from '../components/SkillAnatomyDiagram.astro';
 ---
 <Base title="Architecture — My Alicia">
   <h1>Architecture</h1>
@@ -40,6 +41,11 @@ myalicia/
 ├── surfaces/       # telegram, claude_code, cli adapters
 └── config.py       # the single source of truth for personalization
 </pre>
+
+  <div class="figure">
+    <SkillAnatomyDiagram />
+    <p class="caption">What's inside a single skill module — the contribution surface for designers and builders.</p>
+  </div>
 
   <h2>The three loops</h2>
 
