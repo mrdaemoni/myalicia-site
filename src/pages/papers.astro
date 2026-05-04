@@ -7,14 +7,13 @@ import Base from '../layouts/Base.astro';
     My Alicia stands on the shoulders of researchers, designers, and
     frameworks that saw something the rest of us hadn't yet. This
     page lists the papers, concepts, and intellectual foundations
-    that shaped the project.
+    that shaped the project — every one with a link to the source.
   </p>
 
   <p>
-    Where evidence in the codebase is direct, the connection is
-    cited explicitly. Where the influence is broader, that's noted
-    too. The full version with longer "how myalicia uses it"
-    descriptions is in the repo at <a href="https://github.com/mrdaemoni/myalicia/blob/main/docs/PAPERS.md">docs/PAPERS.md</a>.
+    The fuller version with extended "how myalicia uses it"
+    descriptions is in the repo at
+    <a href="https://github.com/mrdaemoni/myalicia/blob/main/docs/PAPERS.md">docs/PAPERS.md</a>.
   </p>
 
   <hr class="rule" />
@@ -23,7 +22,11 @@ import Base from '../layouts/Base.astro';
 
   <h3>Humorphism</h3>
   <p>
-    <strong>Source:</strong> <a href="https://humorphism.com">humorphism.com</a>
+    <strong>Source:</strong>
+    <a href="https://humorphism.com">humorphism.com</a>
+    &middot;
+    REMOVED' write-up on
+    <a href="https://www.example.com/p/humorphism-in-ai-agents">REMOVED</a>
   </p>
   <p>
     The design philosophy that technology should take the shape of
@@ -35,7 +38,10 @@ import Base from '../layouts/Base.astro';
 
   <h3>Thin Harness, Fat Skills</h3>
   <p>
-    <strong>Source:</strong> <a href="https://x.com/garrytan">Garry Tan</a>
+    <strong>Source:</strong>
+    <a href="https://x.com/garrytan">Garry Tan on X</a>
+    &middot;
+    <a href="https://github.com/garrytan">GitHub</a>
   </p>
   <p>
     Architectural pattern for agent design: a small, opinionated
@@ -48,7 +54,10 @@ import Base from '../layouts/Base.astro';
 
   <h3>Autoresearch</h3>
   <p>
-    <strong>Source:</strong> <a href="https://x.com/karpathy">Andrej Karpathy</a>
+    <strong>Source:</strong>
+    <a href="https://x.com/karpathy">Andrej Karpathy on X</a>
+    &middot;
+    <a href="https://github.com/karpathy">GitHub</a>
   </p>
   <p>
     The pattern of autonomous research loops where an agent runs
@@ -67,9 +76,11 @@ import Base from '../layouts/Base.astro';
     Papers that name or directly shape specific skill modules.
   </p>
 
-  <h3>Reflexion (Shinn et al., 2023)</h3>
+  <h3>Reflexion: Language Agents with Verbal Reinforcement Learning</h3>
   <p>
-    <em>"Reflexion: Language Agents with Verbal Reinforcement Learning"</em>
+    <strong>Authors:</strong> Shinn et al., 2023 &middot;
+    <strong>ArXiv:</strong>
+    <a href="https://arxiv.org/abs/2303.11366">2303.11366</a>
   </p>
   <p>
     Agents critique themselves after tasks and store linguistic
@@ -77,14 +88,24 @@ import Base from '../layouts/Base.astro';
     <code>reflexion.py</code> and <code>meta_reflexion.py</code>.
   </p>
 
-  <h3>Constitutional AI (Bai et al., 2022, Anthropic)</h3>
+  <h3>Constitutional AI: Harmlessness from AI Feedback</h3>
+  <p>
+    <strong>Authors:</strong> Bai et al., 2022 (Anthropic) &middot;
+    <strong>ArXiv:</strong>
+    <a href="https://arxiv.org/abs/2212.08073">2212.08073</a>
+  </p>
   <p>
     Self-criticism and revision against a set of principles.
     Implemented in <code>constitution.py</code> — outputs are scored
     against an evolving constitution before being acted on.
   </p>
 
-  <h3>Generative Agents (Park et al., Stanford 2023)</h3>
+  <h3>Generative Agents: Interactive Simulacra of Human Behavior</h3>
+  <p>
+    <strong>Authors:</strong> Park et al., 2023 (Stanford) &middot;
+    <strong>ArXiv:</strong>
+    <a href="https://arxiv.org/abs/2304.03442">2304.03442</a>
+  </p>
   <p>
     Multi-timescale reflection loops in agent architectures.
     The three-cadence design (Listen / Notice / Know) draws on this
@@ -92,39 +113,55 @@ import Base from '../layouts/Base.astro';
     behave consistently over time.
   </p>
 
-  <h3>Memento-Skills</h3>
+  <h3>ReAct: Synergizing Reasoning and Acting in Language Models</h3>
   <p>
-    Agents that draft new skills from observed failures. Implemented
-    in <code>skill_author.py</code> — when My Alicia notices a gap in
-    her own behavior, she can author a new skill module to handle it.
+    <strong>Authors:</strong> Yao et al., 2023 &middot;
+    <strong>ArXiv:</strong>
+    <a href="https://arxiv.org/abs/2210.03629">2210.03629</a>
+  </p>
+  <p>
+    Interleaving reasoning traces and acting. The
+    <code>handle_message</code> pipeline mirrors this pattern — every
+    message routes through reasoning steps before any tool is called.
+    The <code>tool_router</code> is the action-selection layer.
   </p>
 
-  <h3>SSGM — Self-Stabilizing Guarded Memory</h3>
+  <h3>Voyager: An Open-Ended Embodied Agent with LLMs</h3>
   <p>
-    Guardrails for evolving memory systems that can drift over time.
-    Implemented in <code>memory_audit.py</code> — periodic checks on
-    memory consistency and drift detection.
+    <strong>Authors:</strong> Wang et al., 2023 (NVIDIA) &middot;
+    <strong>ArXiv:</strong>
+    <a href="https://arxiv.org/abs/2305.16291">2305.16291</a>
+  </p>
+  <p>
+    Self-extending agents that author new skills based on observed
+    gaps. Inspires <code>skill_author.py</code> — when My Alicia
+    notices a gap in her own behavior, she can draft a new skill
+    module to handle it.
   </p>
 
-  <h3>MemRL — Memory-Reinforced Learning</h3>
+  <h3>Toolformer: Language Models Can Teach Themselves to Use Tools</h3>
   <p>
-    Reinforcement learning over episodic memory. Implemented in
-    <code>episode_scorer.py</code> — episodes are scored to
-    influence which memories get retrieved in future contexts.
+    <strong>Authors:</strong> Schick et al., 2023 (Meta) &middot;
+    <strong>ArXiv:</strong>
+    <a href="https://arxiv.org/abs/2302.04761">2302.04761</a>
+  </p>
+  <p>
+    Self-supervised tool-use selection. Background influence on
+    <code>tool_router.py</code> — the function-calling dispatcher
+    that chooses which skill to invoke given a message and context.
   </p>
 
-  <h3>Hyperagents</h3>
+  <h3>Tree of Thoughts: Deliberate Problem Solving with LLMs</h3>
   <p>
-    Meta-agents that improve themselves recursively. Implemented in
-    <code>meta_reflexion.py</code> and the <code>self_improve</code>
-    family — the system reflects on its own reflection.
+    <strong>Authors:</strong> Yao et al., 2023 &middot;
+    <strong>ArXiv:</strong>
+    <a href="https://arxiv.org/abs/2305.10601">2305.10601</a>
   </p>
-
-  <h3>TIMG — Trajectory-Informed Method Generalization</h3>
   <p>
-    Decision-level attribution through agent trajectories. Implemented
-    in <code>trajectory.py</code> — every action is recorded with its
-    triggering context for later analysis.
+    Tree-search over reasoning paths. Background influence on the
+    metacognition module's confidence-driven escalation: when the
+    Listen-loop response confidence is low, the request escalates to
+    a deeper Sonnet/Opus pass that explores more thoroughly.
   </p>
 
   <hr class="rule" />
@@ -132,36 +169,54 @@ import Base from '../layouts/Base.astro';
   <h2>Background Influence</h2>
 
   <p>
-    Ideas that shaped the project's worldview but aren't directly
-    cited in the code.
+    Ideas that shaped the project's worldview. Less direct than the
+    module-level citations, but the influence is visible in the code.
   </p>
 
-  <h3>ReAct (Yao et al., 2023)</h3>
+  <h3>Anthropic's Tool Use & Model Card</h3>
   <p>
-    Interleaving reasoning traces and acting. The handle_message
-    pipeline mirrors this pattern — every message routes through
-    reasoning steps before any tool is called.
+    <strong>Source:</strong>
+    <a href="https://docs.claude.com/en/docs/build-with-claude/tool-use">Anthropic Tool Use docs</a>
   </p>
-
-  <h3>Wise Machines (Johnson, Stanford 2024)</h3>
   <p>
-    Five dimensions of wisdom in AI systems. Inspired the
-    metacognition engine's confidence assessment with multiple
-    independent dimensions of self-evaluation.
+    Function-calling primitives that
+    <code>tool_router.py</code> wraps. The whole tool-execution loop
+    in <code>handle_message</code> uses Anthropic's tool-use schema.
   </p>
 
   <h3>Intrinsic Motivation in Agents</h3>
   <p>
-    Curiosity-driven exploration research (Schmidhuber and others).
-    The <code>curiosity_engine.py</code> uses three novelty signals
+    <strong>Source:</strong>
+    <a href="https://people.idsia.ch/~juergen/creativity.html">Schmidhuber's curiosity work</a>
+  </p>
+  <p>
+    Curiosity-driven exploration research. The
+    <code>curiosity_engine.py</code> uses three novelty signals
     derived from this tradition.
   </p>
 
-  <h3>Knowledge Graph Completion</h3>
+  <h3>Knowledge Graphs / Personal Knowledge Management</h3>
   <p>
-    Graph-theoretic approaches to surfacing missing relationships.
-    Used in <code>graph_intelligence.py</code> for vault structure
-    optimization and link prediction.
+    <strong>Source:</strong>
+    <a href="https://obsidian.md">Obsidian</a> &middot;
+    <a href="https://andymatuschak.org/">Andy Matuschak's notes</a>
+  </p>
+  <p>
+    Vault structure assumptions and the link-as-first-class-citizen
+    pattern. <code>graph_intelligence.py</code> builds on these by
+    surfacing missing or weak links between notes the user has
+    accumulated.
+  </p>
+
+  <h3>The Anthropic Claude API</h3>
+  <p>
+    <strong>Source:</strong>
+    <a href="https://docs.claude.com">docs.claude.com</a>
+  </p>
+  <p>
+    The runtime that makes all of this possible. Three model tiers
+    (Haiku / Sonnet / Opus) map directly to the three loops; the
+    metacognition layer escalates between them.
   </p>
 
   <hr class="rule" />
