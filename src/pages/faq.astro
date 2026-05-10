@@ -33,14 +33,15 @@ myalicia init
     through configuration while explaining the three loops.
   </p>
 
-  <h3>Why isn't <code>pip install myalicia</code> working?</h3>
+  <h3>Is <code>pip install myalicia</code> working?</h3>
   <p>
-    v0.1.0 isn't on PyPI yet. The package skeleton, all 80 skill
-    modules, the configuration layer, and the docs are public, but
-    the legacy 7,951-line <code>alicia.py</code> runtime is still
-    being incrementally split into <code>core/</code> modules. Until
-    v0.2 lands the runtime split, source-install is the supported
-    path.
+    Yes. As of v0.1.4, <code>myalicia</code> is on PyPI and
+    <code>pipx install myalicia</code> works for everyone. The
+    incremental <code>core/</code> split (taking the legacy
+    <code>alicia.py</code> runtime apart into focused modules) is
+    ongoing — see <a href="https://github.com/mrdaemoni/myalicia/blob/main/REFACTORING.md">REFACTORING.md</a>
+    for what's shipped and what's queued. Each release ships
+    automatically when a version tag is pushed.
   </p>
 
   <h3>How long does setup take?</h3>
