@@ -1,6 +1,15 @@
 # Cloudflare Pages redirects.
-# Old flat URLs → new /documentation/ nest.
-/architecture                 /documentation/architecture                 301
-/faq                          /documentation/faq                          301
-/papers                       /documentation/papers                       301
-/skills-and-capabilities      /documentation/skills-and-capabilities      301
+# Old flat URLs and previous /documentation/<slug> URLs now collapse
+# into anchored sections on the new long /documentation page.
+/architecture                                /documentation#architecture                 301
+/faq                                         /documentation#faq                          301
+/papers                                      /documentation#papers                       301
+/skills-and-capabilities                     /documentation#skills-and-capabilities      301
+
+/documentation/architecture                  /documentation#architecture                 301
+/documentation/faq                           /documentation#faq                          301
+/documentation/papers                        /documentation#papers                       301
+/documentation/skills-and-capabilities       /documentation#skills-and-capabilities      301
+
+# Essay deep links collapse into anchors on /essays.
+/essays/the-humorphic-partnership            /essays#the-humorphic-partnership           301

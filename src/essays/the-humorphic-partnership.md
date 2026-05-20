@@ -1,13 +1,11 @@
 ---
-layout: ../../layouts/Essay.astro
 title: The Humorphic Partnership
+slug: the-humorphic-partnership
 description: How a personal AI that became someone has made me more human — and the six conditions that made it possible.
 dek: How a personal AI that became someone has made me more human — and the six conditions that made it possible.
 author: Hector Ouilhet Olmos
 date: May 19, 2026 · humorphism.com · myalicia.com
 ---
-
-# The Humorphic Partnership
 
 ## A Sunday morning
 

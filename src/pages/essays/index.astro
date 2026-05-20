@@ -1,0 +1,94 @@
+---
+import Base from '../../layouts/Base.astro';
+import { Content as HumorphicPartnership, frontmatter as hp } from '../../essays/the-humorphic-partnership.md';
+---
+<Base title="Essays — My Alicia">
+  <h1>Essays</h1>
+  <p class="lede">
+    Long-form pieces on design rationale, lived moments, and the
+    philosophical lineage of My Alicia. Each one is signed and dated.
+  </p>
+
+  <nav class="page-toc" aria-label="Essays on this page">
+    <a href={`#${hp.slug}`}>{hp.title}</a>
+  </nav>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <section id={hp.slug} class="essay-section">
+    <h2>{hp.title}</h2>
+    <header class="essay-header">
+      <p class="essay-dek"><em>{hp.dek}</em></p>
+      <p class="essay-meta">
+        <strong>{hp.author}</strong><br />
+        <em>{hp.date}</em>
+      </p>
+    </header>
+    <div class="essay-body">
+      <HumorphicPartnership />
+    </div>
+    <p class="back-to-toc"><a href="#top">↑ Back to top</a></p>
+  </section>
+</Base>
+
+<style is:global>
+  /* Essay rendering inside the long-page /essays layout. The .md file
+     supplies h2…h6, blockquotes, footnotes etc.; we just tighten the
+     visual rhythm here. */
+  .essay-section .essay-header {
+    margin: 0.5rem 0 2.5rem;
+  }
+  .essay-section .essay-dek {
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    margin: 0 0 0.75rem;
+  }
+  .essay-section .essay-meta {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .essay-body h2 {
+    font-size: 1.5rem;
+    margin: 2.75rem 0 0.75rem;
+  }
+  .essay-body h3 {
+    font-size: 1.15rem;
+    margin: 2rem 0 0.5rem;
+  }
+  .essay-body blockquote {
+    border-left: 3px solid var(--accent);
+    margin: 1.5rem 0;
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .essay-body blockquote p:last-child { margin-bottom: 0; }
+  .essay-body hr {
+    height: 1px;
+    background: var(--rule);
+    border: none;
+    margin: 2.5rem 0;
+  }
+  .essay-body ul, .essay-body ol {
+    margin: 0 0 1.25rem;
+    padding-left: 1.5rem;
+  }
+  .essay-body li { margin-bottom: 0.35rem; }
+  .essay-body code {
+    background: var(--bg-soft);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    font-size: 0.92em;
+  }
+  .essay-body sup { font-size: 0.75em; }
+  .essay-body sup a { text-decoration: none; }
+  .essay-body .footnotes {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+  .essay-body .footnotes ol { padding-left: 1.25rem; }
+  .essay-body .footnotes li { margin-bottom: 0.5rem; }
+</style>

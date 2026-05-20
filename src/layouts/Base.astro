@@ -99,55 +99,6 @@ const {
         font-size: 0.95rem;
       }
       nav.top a { color: var(--ink-soft); margin-right: 1.5rem; }
-      /* Dropdown groups: <details> with <summary> for click + keyboard,
-         CSS :hover override for desktop pointer users. */
-      nav.top details.nav-group {
-        display: inline-block;
-        position: relative;
-        margin-right: 1.5rem;
-      }
-      nav.top details.nav-group summary {
-        cursor: pointer;
-        list-style: none;
-        color: var(--ink-soft);
-        display: inline;
-      }
-      nav.top details.nav-group summary::-webkit-details-marker { display: none; }
-      nav.top details.nav-group summary::after { content: " \25BE"; opacity: 0.55; font-size: 0.85em; }
-      nav.top details.nav-group[open] summary::after { content: " \25B4"; opacity: 0.9; }
-      nav.top details.nav-group .nav-menu {
-        display: none;
-        position: absolute;
-        top: 1.6em;
-        left: -0.6rem;
-        background: var(--bg);
-        border: 1px solid var(--rule);
-        border-radius: 6px;
-        padding: 0.4rem 0;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.07);
-        z-index: 10;
-        min-width: 13rem;
-      }
-      nav.top details.nav-group[open] .nav-menu { display: block; }
-      nav.top details.nav-group .nav-menu a {
-        display: block;
-        margin: 0;
-        padding: 0.4rem 1rem;
-        white-space: nowrap;
-      }
-      nav.top details.nav-group .nav-menu a:hover { background: var(--bg-soft); }
-      /* Desktop pointer devices: open on hover, no click required. */
-      @media (hover: hover) {
-        nav.top details.nav-group:hover .nav-menu { display: block; }
-        nav.top details.nav-group:hover summary::after { content: " \25B4"; opacity: 0.9; }
-      }
-      footer {
-        max-width: var(--max);
-        margin: 0 auto;
-        padding: 2rem 1.5rem 4rem;
-        font-size: 0.9rem;
-        color: var(--ink-soft);
-      }
       /* Mobile: enlarge SVG diagram text so labels are readable
          without pinch-zoom on phones. */
       @media (max-width: 480px) {
@@ -157,42 +108,19 @@ const {
         main { padding: 2.5rem 1.25rem 4rem; }
         nav.top { padding: 1rem 1.25rem 0; font-size: 0.9rem; }
         nav.top a { margin-right: 1rem; }
-        nav.top details.nav-group { margin-right: 1rem; }
-        nav.top details.nav-group .nav-menu { min-width: 11rem; }
       }
     </style>
   </head>
   <body>
-    <nav class="top">
+    <nav class="top" id="top">
       <a href="/">My Alicia</a>
       <a href="/philosophy">philosophy</a>
-      <details class="nav-group">
-        <summary>documentation</summary>
-        <div class="nav-menu">
-          <a href="/documentation/skills-and-capabilities">skills &amp; capabilities</a>
-          <a href="/documentation/architecture">architecture</a>
-          <a href="/documentation/faq">faq</a>
-          <a href="/documentation/papers">papers</a>
-        </div>
-      </details>
-      <details class="nav-group">
-        <summary>essays</summary>
-        <div class="nav-menu">
-          <a href="/essays/the-humorphic-partnership">the humorphic partnership</a>
-        </div>
-      </details>
+      <a href="/documentation">documentation</a>
+      <a href="/essays">essays</a>
       <a href="https://github.com/mrdaemoni/myalicia">github</a>
     </nav>
     <main>
       <slot />
     </main>
-    <footer>
-      <p>
-        My Alicia is the tangible example of <a href="https://humorphism.com">humorphism</a>.
-        Built on <a href="https://github.com/garrytan">Garry Tan</a>'s thin-harness pattern
-        and <a href="https://github.com/karpathy">Andrej Karpathy</a>'s autoresearch idea.
-        MIT licensed.
-      </p>
-    </footer>
   </body>
 </html>

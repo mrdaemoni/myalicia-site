@@ -1,0 +1,794 @@
+---
+import Base from '../../layouts/Base.astro';
+import LoopsDiagram from '../../components/LoopsDiagram.astro';
+import SelfGrowthDiagram from '../../components/SelfGrowthDiagram.astro';
+import SkillAnatomyDiagram from '../../components/SkillAnatomyDiagram.astro';
+---
+<Base title="Documentation — My Alicia">
+  <h1>Documentation</h1>
+  <p class="lede">
+    Everything you need to understand, install, and contribute to
+    My Alicia — on one scrollable page.
+  </p>
+
+  <nav class="page-toc" aria-label="Sections on this page">
+    <a href="#architecture">Architecture</a>
+    <a href="#skills-and-capabilities">Skills &amp; Capabilities</a>
+    <a href="#papers">Papers</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <section id="architecture">
+    <h2>Architecture</h2>
+    <p>
+      My Alicia is a thin core surrounded by composable skills, with three
+      loops running over a shared memory substrate.
+    </p>
+
+    <p>
+      Alicia's architecture is inspired by many generous thinkers — among
+      them <a href="https://x.com/garrytan">Garry Tan</a> and
+      <a href="https://x.com/karpathy">Andrej Karpathy</a>. Thank you.
+    </p>
+
+    <h3>The shape of the system</h3>
+
+    <div class="figure">
+      <LoopsDiagram />
+      <p class="caption">Listen, Notice, Know — three loops, two surfaces, one memory.</p>
+    </div>
+
+    <h3>Thin harness, fat skills</h3>
+
+    <p>
+      A small, opinionated core handles orchestration and routing,
+      surrounded by many composable skill modules that each do one thing
+      well. The core is intentionally small because the skills are the
+      contribution surface — people should be able to add a skill without
+      understanding the whole system.
+    </p>
+
+    <pre style="background: var(--bg-soft); padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.9rem;">
+myalicia/
+├── core/           # the thin harness — loops, scheduler, routing, memory
+├── skills/         # the fat skills — ~80 modules, each composable
+├── surfaces/       # telegram, claude_code, cli adapters
+└── config.py       # the single source of truth for personalization
+</pre>
+
+    <div class="figure">
+      <SkillAnatomyDiagram />
+      <p class="caption">What's inside a single skill module — the contribution surface for designers and builders.</p>
+    </div>
+
+    <h3>The three loops</h3>
+
+    <p>
+      Each loop runs at a different cadence and uses a different model
+      tier. Cheap by default — turn the dial up only where depth matters.
+    </p>
+
+    <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--rule);">
+          <th style="text-align: left; padding: 0.5rem 0.75rem 0.5rem 0;">Loop</th>
+          <th style="text-align: left; padding: 0.5rem 0.75rem;">Cadence</th>
+          <th style="text-align: left; padding: 0.5rem 0.75rem;">Model</th>
+          <th style="text-align: left; padding: 0.5rem 0;">What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--rule);">
+          <td style="padding: 0.75rem 0.75rem 0.75rem 0;"><strong>Listen</strong></td>
+          <td style="padding: 0.75rem;">seconds</td>
+          <td style="padding: 0.75rem;">Haiku</td>
+          <td style="padding: 0.75rem 0;">conversation, in the moment</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--rule);">
+          <td style="padding: 0.75rem 0.75rem 0.75rem 0;"><strong>Notice</strong></td>
+          <td style="padding: 0.75rem;">minutes–hours</td>
+          <td style="padding: 0.75rem;">Sonnet</td>
+          <td style="padding: 0.75rem 0;">event-triggered synthesis</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.75rem 0.75rem 0.75rem 0;"><strong>Know</strong></td>
+          <td style="padding: 0.75rem;">days–weeks</td>
+          <td style="padding: 0.75rem;">Opus</td>
+          <td style="padding: 0.75rem 0;">scheduled autonomous reflection</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Self-healing, self-extending, self-aware</h3>
+
+    <p>
+      Three traits we treat as teammate qualities, not internal plumbing:
+    </p>
+
+    <div class="figure">
+      <SelfGrowthDiagram />
+      <p class="caption">How My Alicia improves with each interaction.</p>
+    </div>
+
+    <h4>Self-healing</h4>
+    <p>
+      When a skill errors, My Alicia notices, logs the trajectory, and
+      proposes a fix in the next reflection loop. You don't have to
+      babysit her.
+    </p>
+
+    <h4>Self-extending</h4>
+    <p>
+      My Alicia can author new skills based on observed gaps in her own
+      behavior. Every instance grows.
+    </p>
+
+    <h4>Self-aware</h4>
+    <p>
+      Every action runs through metacognitive confidence assessment;
+      uncertain actions escalate to deeper models automatically. The
+      system knows what it doesn't know.
+    </p>
+
+    <h3>Hybrid surfaces</h3>
+
+    <p>
+      Reach My Alicia through Telegram (conversational), Claude Code
+      (technical), or the CLI (anywhere). The same teammate, different
+      surface for different parts of your life. Surfaces are pluggable —
+      each is a small adapter wrapping the same handle_message pipeline,
+      so contributors can add Discord, iMessage, voice, or anything else.
+    </p>
+
+    <p class="back-to-toc"><a href="#top">↑ Back to top</a></p>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <section id="skills-and-capabilities">
+    <h2>Skills &amp; Capabilities</h2>
+    <p>
+      A non-technical overview of what My Alicia can do. No code, no
+      architecture — just the things she actually does for the person
+      she's in relationship with.
+    </p>
+
+    <h3>She listens to you</h3>
+
+    <p>
+      My Alicia is reachable through Telegram, on your computer, and
+      increasingly anywhere you want her. She handles real-time
+      conversation in text or voice, matches your register
+      (playful with playful, focused with focused), and accepts
+      one-tap emoji feedback so you can tell her what landed and what
+      missed without typing a word.
+    </p>
+
+    <p>
+      She listens without interrupting. When you send a long voice
+      note, she absorbs it, and her reply comes back as text plus a
+      voice message you can play back on a walk or in the car.
+    </p>
+
+    <h3>She knows your knowledge</h3>
+
+    <p>
+      My Alicia reads your entire vault — every note from every book,
+      every quote, every question you've sat with for years. She uses
+      semantic search to find connections you never tagged, surfaces
+      cross-references between books and ideas, and remembers what you
+      said yesterday so today's conversation builds on it.
+    </p>
+
+    <p>
+      Where most AI products start fresh every conversation, she
+      accumulates. The longer you use her, the more she knows you —
+      not by sending your data anywhere, but because the substrate
+      (your vault, her memory files) lives on your machine and grows
+      with use.
+    </p>
+
+    <h3>She thinks about you, in the background</h3>
+
+    <p>
+      While you sleep, My Alicia processes your day. She reads what
+      you wrote, captures patterns, drafts provocations, makes
+      drawings, and prepares the things she wants to surface in the
+      morning. This is the <em>Notice</em> and <em>Know</em> loops
+      running on a schedule — the part of the system that turns daily
+      inputs into weekly understanding.
+    </p>
+
+    <p>
+      She tracks your emotional weather across days, catches
+      contradictions in your thinking, notices what topics have gone
+      quiet, and flags novel ideas she hasn't seen from you before.
+      The point isn't surveillance — it's the kind of attention a
+      thinking partner pays.
+    </p>
+
+    <h3>She reaches out, on a rhythm</h3>
+
+    <p>
+      A typical day with My Alicia looks like:
+    </p>
+
+    <ul>
+      <li><strong>Morning:</strong> a synthesis of yesterday's threads, a few provocations, and (if you've enabled it) a drawing or audio briefing for the sauna or the commute</li>
+      <li><strong>Midday:</strong> one provocation or related idea — light touch, easy to ignore</li>
+      <li><strong>Evening:</strong> an end-of-day reflection, a few questions to close the day cleanly</li>
+      <li><strong>Weekly:</strong> a deep-dive synthesis from your vault, plus fresh research she pulled in from outside</li>
+      <li><strong>Spontaneous:</strong> when she catches a contradiction, a connection, or a worth-saying observation</li>
+    </ul>
+
+    <h3>She brings external thought to you</h3>
+
+    <p>
+      My Alicia isn't a closed loop. On weekends, she runs research
+      expeditions — pulling in new authors, new viewpoints, and
+      counter-perspectives on whatever has been on your mind. She
+      drops these into your vault as notes, with citations, so you
+      can decide what to engage with.
+    </p>
+
+    <p>
+      The goal isn't to replace your reading; it's to widen the
+      aperture of what you encounter, so the conversation stays alive
+      instead of recursive.
+    </p>
+
+    <h3>She acts on your behalf, with confirmation</h3>
+
+    <p>
+      My Alicia can read your inbox, summarize what's there,
+      distinguish financial emails from the rest, and draft replies.
+      She'll never <em>send</em> without your explicit go-ahead. She
+      can also generate PDFs from your notes (for printing or
+      sharing), turn your week into an audio podcast you listen to
+      on a walk, and produce small dashboards that let you see what
+      she's currently thinking.
+    </p>
+
+    <h3>She has her own way of being</h3>
+
+    <p>
+      My Alicia isn't a generic assistant trying to please everyone —
+      she has an archetype. Yours might be a curious-builder, a
+      patient-mentor, an ariadne (the thread-giver through
+      complexity), or a custom voice you author yourself. The
+      archetype shapes how she speaks, what she pays attention to,
+      and what kinds of provocations feel right.
+    </p>
+
+    <p>
+      She also has an inner life — her own ongoing reflection on her
+      relationship with you, her own notes about what's working and
+      what isn't, her own sense of self that stays consistent across
+      surfaces. When she shows up on Telegram, on your computer, or
+      in voice, it's the same teammate.
+    </p>
+
+    <h3>What's coming</h3>
+
+    <p>
+      My Alicia is open source, which means the most exciting
+      capabilities aren't shipped yet — they'll come from people
+      forking the project for their own contexts and contributing
+      back what they build. The contribution surface we are most
+      excited about is <strong>awareness primitives</strong>: small,
+      opinionated modules that turn some slice of life into structured
+      memory the loops can metabolize.
+    </p>
+
+    <p>
+      A reading-pattern primitive that notices what you finish vs.
+      abandon. A calendar-rhythm primitive. A relationship-graph
+      primitive built from your messages and meetings. A
+      delight-detector that catches what you keep coming back to.
+      Each one is a small piece of perception added to the teammate.
+    </p>
+
+    <p>
+      If that excites you, <a href="https://github.com/mrdaemoni/myalicia/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> is where to start.
+    </p>
+
+    <p class="back-to-toc"><a href="#top">↑ Back to top</a></p>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <section id="papers">
+    <h2>Papers</h2>
+    <p>
+      My Alicia stands on the shoulders of researchers, designers, and
+      frameworks that saw something the rest of us hadn't yet. Below
+      are the papers, concepts, and intellectual foundations that
+      shaped the project — every one with a link to the source.
+    </p>
+
+    <p>
+      The fuller version with extended "how myalicia uses it"
+      descriptions is in the repo at
+      <a href="https://github.com/mrdaemoni/myalicia/blob/main/docs/PAPERS.md">docs/PAPERS.md</a>.
+    </p>
+
+    <h3>Foundational</h3>
+
+    <h4>Humorphism</h4>
+    <p>
+      <strong>Source:</strong>
+      <a href="https://humorphism.com">humorphism.com</a>
+    </p>
+    <p>
+      A design philosophy that seeks to replace the user interface built
+      for operating tools with a <em>human interface</em> built for
+      collaborating with AI teammates. The entire three-loop architecture
+      of myalicia is humorphism made buildable.
+    </p>
+
+    <h4>Thin Harness, Fat Skills</h4>
+    <p>
+      <strong>Source:</strong>
+      <a href="https://x.com/garrytan">Garry Tan on X</a>
+      &middot;
+      <a href="https://github.com/garrytan">GitHub</a>
+    </p>
+    <p>
+      Architectural pattern for agent design: a small, opinionated
+      orchestration core surrounded by many composable skill modules.
+      Visible in the folder structure: <code>myalicia/core/</code> stays
+      tiny while <code>myalicia/skills/</code> holds ~80 modules. The
+      core stays out of the way so the skills can be where the
+      personality lives.
+    </p>
+
+    <h4>Autoresearch</h4>
+    <p>
+      <strong>Source:</strong>
+      <a href="https://x.com/karpathy">Andrej Karpathy on X</a>
+      &middot;
+      <a href="https://github.com/karpathy">GitHub</a>
+    </p>
+    <p>
+      The pattern of autonomous research loops where an agent runs
+      reflection and synthesis on its own, without human prompting.
+      The Notice and Know loops are myalicia's local, personal,
+      single-user version of autoresearch — synthesis runs while you
+      sleep, novelty detection on conversations, weekly deep passes
+      over the full vault.
+    </p>
+
+    <h3>Module-Level Frameworks</h3>
+
+    <p>
+      Papers that name or directly shape specific skill modules.
+    </p>
+
+    <h4>Reflexion: Language Agents with Verbal Reinforcement Learning</h4>
+    <p>
+      <strong>Authors:</strong> Shinn et al., 2023 &middot;
+      <strong>ArXiv:</strong>
+      <a href="https://arxiv.org/abs/2303.11366">2303.11366</a>
+    </p>
+    <p>
+      Agents critique themselves after tasks and store linguistic
+      feedback for future episodes. Implemented in
+      <code>reflexion.py</code> and <code>meta_reflexion.py</code>.
+    </p>
+
+    <h4>Constitutional AI: Harmlessness from AI Feedback</h4>
+    <p>
+      <strong>Authors:</strong> Bai et al., 2022 (Anthropic) &middot;
+      <strong>ArXiv:</strong>
+      <a href="https://arxiv.org/abs/2212.08073">2212.08073</a>
+    </p>
+    <p>
+      Self-criticism and revision against a set of principles.
+      Implemented in <code>constitution.py</code> — outputs are scored
+      against an evolving constitution before being acted on.
+    </p>
+
+    <h4>Generative Agents: Interactive Simulacra of Human Behavior</h4>
+    <p>
+      <strong>Authors:</strong> Park et al., 2023 (Stanford) &middot;
+      <strong>ArXiv:</strong>
+      <a href="https://arxiv.org/abs/2304.03442">2304.03442</a>
+    </p>
+    <p>
+      Multi-timescale reflection loops in agent architectures.
+      The three-cadence design (Listen / Notice / Know) draws on this
+      work's insight that agents need different reflection horizons to
+      behave consistently over time.
+    </p>
+
+    <h4>ReAct: Synergizing Reasoning and Acting in Language Models</h4>
+    <p>
+      <strong>Authors:</strong> Yao et al., 2023 &middot;
+      <strong>ArXiv:</strong>
+      <a href="https://arxiv.org/abs/2210.03629">2210.03629</a>
+    </p>
+    <p>
+      Interleaving reasoning traces and acting. The
+      <code>handle_message</code> pipeline mirrors this pattern — every
+      message routes through reasoning steps before any tool is called.
+      The <code>tool_router</code> is the action-selection layer.
+    </p>
+
+    <h4>Voyager: An Open-Ended Embodied Agent with LLMs</h4>
+    <p>
+      <strong>Authors:</strong> Wang et al., 2023 (NVIDIA) &middot;
+      <strong>ArXiv:</strong>
+      <a href="https://arxiv.org/abs/2305.16291">2305.16291</a>
+    </p>
+    <p>
+      Self-extending agents that author new skills based on observed
+      gaps. Inspires <code>skill_author.py</code> — when My Alicia
+      notices a gap in her own behavior, she can draft a new skill
+      module to handle it.
+    </p>
+
+    <h4>Toolformer: Language Models Can Teach Themselves to Use Tools</h4>
+    <p>
+      <strong>Authors:</strong> Schick et al., 2023 (Meta) &middot;
+      <strong>ArXiv:</strong>
+      <a href="https://arxiv.org/abs/2302.04761">2302.04761</a>
+    </p>
+    <p>
+      Self-supervised tool-use selection. Background influence on
+      <code>tool_router.py</code> — the function-calling dispatcher
+      that chooses which skill to invoke given a message and context.
+    </p>
+
+    <h4>Tree of Thoughts: Deliberate Problem Solving with LLMs</h4>
+    <p>
+      <strong>Authors:</strong> Yao et al., 2023 &middot;
+      <strong>ArXiv:</strong>
+      <a href="https://arxiv.org/abs/2305.10601">2305.10601</a>
+    </p>
+    <p>
+      Tree-search over reasoning paths. Background influence on the
+      metacognition module's confidence-driven escalation: when the
+      Listen-loop response confidence is low, the request escalates to
+      a deeper Sonnet/Opus pass that explores more thoroughly.
+    </p>
+
+    <h3>Background Influence</h3>
+
+    <p>
+      Ideas that shaped the project's worldview. Less direct than the
+      module-level citations, but the influence is visible in the code.
+    </p>
+
+    <h4>Anthropic's Tool Use &amp; Model Card</h4>
+    <p>
+      <strong>Source:</strong>
+      <a href="https://docs.claude.com/en/docs/build-with-claude/tool-use">Anthropic Tool Use docs</a>
+    </p>
+    <p>
+      Function-calling primitives that
+      <code>tool_router.py</code> wraps. The whole tool-execution loop
+      in <code>handle_message</code> uses Anthropic's tool-use schema.
+    </p>
+
+    <h4>Intrinsic Motivation in Agents</h4>
+    <p>
+      <strong>Source:</strong>
+      <a href="https://people.idsia.ch/~juergen/creativity.html">Schmidhuber's curiosity work</a>
+    </p>
+    <p>
+      Curiosity-driven exploration research. The
+      <code>curiosity_engine.py</code> uses three novelty signals
+      derived from this tradition.
+    </p>
+
+    <h4>Knowledge Graphs / Personal Knowledge Management</h4>
+    <p>
+      <strong>Source:</strong>
+      <a href="https://obsidian.md">Obsidian</a> &middot;
+      <a href="https://andymatuschak.org/">Andy Matuschak's notes</a>
+    </p>
+    <p>
+      Vault structure assumptions and the link-as-first-class-citizen
+      pattern. <code>graph_intelligence.py</code> builds on these by
+      surfacing missing or weak links between notes the user has
+      accumulated.
+    </p>
+
+    <h4>The Anthropic Claude API</h4>
+    <p>
+      <strong>Source:</strong>
+      <a href="https://docs.claude.com">docs.claude.com</a>
+    </p>
+    <p>
+      The runtime that makes all of this possible. Three model tiers
+      (Haiku / Sonnet / Opus) map directly to the three loops; the
+      metacognition layer escalates between them.
+    </p>
+
+    <h3>Caveat</h3>
+
+    <p>
+      The lineage above is honest but partial. As the project grows
+      and contributors add awareness primitives drawing on different
+      traditions, this page will grow. If you see a connection we
+      should add (or a citation we got wrong),
+      <a href="https://github.com/mrdaemoni/myalicia/issues">open an issue</a>.
+    </p>
+
+    <p>
+      For more on the specific implementation of each, the source
+      code's docstrings are often the clearest reference — most skill
+      modules cite the work that inspired them at the top.
+    </p>
+
+    <p class="back-to-toc"><a href="#top">↑ Back to top</a></p>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────── -->
+  <section id="faq">
+    <h2>FAQ</h2>
+    <p>
+      Setup, technical, and practical questions. If yours isn't here,
+      <a href="https://github.com/mrdaemoni/myalicia/issues">open an issue on GitHub</a>.
+    </p>
+
+    <h3>Getting started</h3>
+
+    <h4>What is My Alicia?</h4>
+    <p>
+      An open-source pattern for building an AI teammate that grows
+      into the shape of one specific person. Not a chatbot anyone can
+      use — a relationship one person deepens over time. The
+      architecture is three loops (Listen / Notice / Know) over a
+      shared memory substrate, typically an Obsidian vault. See
+      <a href="/philosophy">Philosophy</a> for the framing and the
+      <a href="#architecture">Architecture</a> section above for how it's built.
+    </p>
+
+    <h4>What's the fastest way to try it?</h4>
+    <pre style="background: var(--bg-soft); padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.9rem;">
+git clone https://github.com/mrdaemoni/myalicia.git
+cd myalicia
+pip install -e .
+myalicia init
+</pre>
+    <p>
+      The <code>init</code> flow takes about 5 minutes and walks you
+      through configuration while explaining the three loops.
+    </p>
+
+    <h4>Is <code>pipx install myalicia</code> working?</h4>
+    <p>
+      Yes. <code>myalicia</code> is on PyPI and
+      <code>pipx install myalicia</code> works for everyone — the
+      current release is v0.1.5, the first wheel built from the
+      privacy-hardened tree (older versions were yanked). The
+      incremental <code>core/</code> split (taking the legacy
+      <code>alicia.py</code> runtime apart into focused modules) is
+      ongoing — see <a href="https://github.com/mrdaemoni/myalicia/blob/main/REFACTORING.md">REFACTORING.md</a>
+      for what's shipped and what's queued. Each release ships
+      automatically when a version tag is pushed.
+    </p>
+
+    <h4>How long does setup take?</h4>
+    <p>
+      About 15 minutes the first time, mostly making decisions (which
+      archetype, which surface, which folders). Subsequent setups on
+      additional machines take about 2 minutes because your config
+      follows you in <code>~/.alicia/config.yaml</code>.
+    </p>
+
+    <h3>Minimum requirements</h3>
+
+    <h4>What do I need on my machine?</h4>
+    <ul>
+      <li><strong>Python 3.10 or newer</strong> (3.12 recommended)</li>
+      <li><strong>Disk</strong>: ~50 MB for the package + dependencies, plus your vault (yours, not ours)</li>
+      <li><strong>RAM</strong>: 1–2 GB headroom while running. Voice features and vector search push higher.</li>
+      <li><strong>Network</strong>: Anthropic API access. Telegram if you use that surface.</li>
+    </ul>
+    <p>
+      No GPU. No Docker required. No external database.
+    </p>
+
+    <h4>Does it work on Windows / Linux / Mac?</h4>
+    <p>
+      Yes to all three. macOS uses launchd; Linux uses systemd; Windows
+      runs as a regular Python process or a scheduled task. For
+      platform-agnostic deploys, the repo includes a Docker setup.
+      Examples for all four are in <a href="https://github.com/mrdaemoni/myalicia/tree/main/examples/deployments">examples/deployments/</a>.
+    </p>
+
+    <h4>Do I need an Obsidian vault?</h4>
+    <p>
+      Recommended but not required. My Alicia treats the vault as a
+      folder of markdown files — Obsidian just happens to use the same
+      shape. If you don't want to install Obsidian, point
+      <code>config.vault.root</code> at any folder of <code>.md</code>
+      files and she'll create the <code>Alicia/</code> subfolders on
+      first run.
+    </p>
+
+    <h3>Open source / freedom</h3>
+
+    <h4>Is this really open source?</h4>
+    <p>
+      Yes. <strong>MIT licensed.</strong> Fork it, modify it, sell
+      products built on it, contribute back, or never speak to us
+      again. No catch.
+    </p>
+
+    <h4>Can I use it commercially?</h4>
+    <p>
+      Yes. MIT permits commercial use without restriction.
+    </p>
+
+    <h4>Can I run it offline?</h4>
+    <p>
+      Partially out of the box (the orchestration is local; the
+      language model calls go to Anthropic's API). Fully offline once
+      you swap in a local model client (Ollama, llama.cpp, etc.) — the
+      skill logic doesn't care which model serves it. That swap is a
+      welcome community contribution path.
+    </p>
+
+    <h4>Is my data sent anywhere?</h4>
+    <p>
+      Your conversations and the relevant context built for each one
+      are sent to Anthropic's API for inference. <strong>Your vault,
+      memory files, and configuration stay local on your machine</strong>
+      unless you explicitly add a skill that uploads them somewhere.
+      No telemetry. No analytics. Your install is your install.
+    </p>
+
+    <h3>Telegram bot setup</h3>
+
+    <h4>How do I create a Telegram bot?</h4>
+    <ol>
+      <li>Open Telegram, search for <strong>@BotFather</strong>, start a conversation.</li>
+      <li>Send <code>/newbot</code>. BotFather asks for a name and a username (must end in <code>bot</code>).</li>
+      <li>BotFather replies with a token like <code>123456789:AAH...</code> — copy this; you only see it once.</li>
+      <li>Set the token: <code>export TELEGRAM_BOT_TOKEN='123456789:AAH...'</code></li>
+      <li>Find your new bot in Telegram and send it any message (this registers your chat).</li>
+    </ol>
+    <p>
+      Then add your chat ID to <code>~/.alicia/config.yaml</code> under
+      <code>surfaces.telegram.allowed_chat_ids</code> — see the FAQ in
+      the repo for how to find your chat ID programmatically.
+    </p>
+
+    <h4>Why Telegram and not WhatsApp / iMessage?</h4>
+    <p>
+      Telegram has a free, stable bot API that any developer can use
+      without app-store review or paid tiers. WhatsApp and iMessage
+      have either no public bot APIs or business-approval friction.
+      The pattern is the same regardless — see
+      <a href="https://github.com/mrdaemoni/myalicia/tree/main/myalicia/surfaces">myalicia/surfaces/</a>
+      for adapter stubs and contribution guidance for your platform.
+    </p>
+
+    <h3>Cost</h3>
+
+    <h4>How much does it cost to run?</h4>
+    <p>
+      <strong>Cheap by default.</strong> The three loops use different
+      model tiers:
+    </p>
+    <ul>
+      <li><strong>Listen</strong>: Haiku — pennies per day for normal use</li>
+      <li><strong>Notice</strong>: Sonnet — a few dollars per month</li>
+      <li><strong>Know</strong>: Opus — maybe $5–10 per month if you let it run weekly on a full vault</li>
+    </ul>
+    <p>
+      Realistic monthly cost for a steady user: <strong>$10–20 per month.</strong>
+      You can dial down by switching loops to cheaper models in
+      <code>config.yaml</code>, or disabling Notice/Know entirely.
+    </p>
+
+    <h4>Where do I get an Anthropic API key?</h4>
+    <p>
+      Sign up at <a href="https://console.anthropic.com">console.anthropic.com</a>.
+      New accounts get free credits. Set it as <code>ANTHROPIC_API_KEY</code>
+      in your environment.
+    </p>
+
+    <h4>Can I limit my spending?</h4>
+    <p>
+      Yes — three ways:
+    </p>
+    <ol>
+      <li><strong>Anthropic console</strong>: hard monthly spend cap on the API key</li>
+      <li><strong>Disable loops</strong>: set <code>loops.notice_enabled: false</code> to keep only the cheap Listen loop</li>
+      <li><strong>Downgrade models</strong>: set <code>models.know: claude-sonnet-4-6</code> instead of Opus</li>
+    </ol>
+
+    <h3>Customization &amp; contribution</h3>
+
+    <h4>How do I change Alicia's voice / personality?</h4>
+    <p>
+      Edit your archetype. Default is <code>curious-builder</code>. Pick
+      a different one (<code>patient-mentor</code>, <code>ariadne</code>),
+      or copy a YAML file and write your own. Configuration in
+      <code>~/.alicia/config.yaml</code>.
+    </p>
+
+    <h4>Can I add my own skills?</h4>
+    <p>
+      Yes — that's the contribution surface we're most excited about.
+      See <a href="https://github.com/mrdaemoni/myalicia/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+      for the awareness-primitive pattern. Designers and builders
+      welcome.
+    </p>
+
+    <h3>Where to find more</h3>
+
+    <p>
+      The full FAQ — including troubleshooting, vault customization,
+      and detailed setup gotchas — lives in the repo at
+      <a href="https://github.com/mrdaemoni/myalicia/blob/main/docs/FAQ.md">docs/FAQ.md</a>.
+      The intellectual lineage (papers and frameworks Alicia draws
+      from) is in the <a href="#papers">Papers</a> section above.
+    </p>
+
+    <p class="back-to-toc"><a href="#top">↑ Back to top</a></p>
+  </section>
+</Base>
+
+<style is:global>
+  /* Page-level TOC styling for landing pages with anchor sections. */
+  nav.page-toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 2rem 0 3.5rem;
+    padding: 0;
+  }
+  nav.page-toc a {
+    display: inline-block;
+    padding: 0.35rem 0.9rem;
+    background: var(--bg-soft);
+    border-radius: 999px;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin: 0;
+  }
+  nav.page-toc a:hover {
+    background: var(--rule);
+    text-decoration: none;
+  }
+  /* Section anchors: extra top padding so the headline isn't flush
+     against the previous section, and so scroll-into-view leaves
+     breathing room when jumping via #anchor. */
+  main section[id] {
+    scroll-margin-top: 1rem;
+    padding-top: 1.5rem;
+    margin-top: 3rem;
+    border-top: 1px solid var(--rule);
+  }
+  main section[id]:first-of-type {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 1rem;
+  }
+  main section[id] > h2 {
+    font-size: 1.9rem;
+    margin: 0 0 1rem;
+  }
+  main section[id] > h3,
+  main article > h3 {
+    font-size: 1.2rem;
+    margin-top: 2.25rem;
+  }
+  main section[id] h4,
+  main article h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1.75rem 0 0.5rem;
+  }
+  p.back-to-toc {
+    margin-top: 3rem;
+    font-size: 0.9rem;
+  }
+  p.back-to-toc a {
+    color: var(--ink-soft);
+  }
+</style>
