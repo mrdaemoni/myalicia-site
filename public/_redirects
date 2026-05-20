@@ -1,0 +1,6 @@
+# Cloudflare Pages redirects.
+# Old flat URLs → new /documentation/ nest.
+/architecture                 /documentation/architecture                 301
+/faq                          /documentation/faq                          301
+/papers                       /documentation/papers                       301
+/skills-and-capabilities      /documentation/skills-and-capabilities      301
