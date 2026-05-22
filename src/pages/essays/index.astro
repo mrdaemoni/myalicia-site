@@ -20,8 +20,18 @@ import { Content as HumorphicPartnership, frontmatter as hp } from '../../essays
       <p class="essay-dek"><em>{hp.dek}</em></p>
       <p class="essay-meta">
         <strong>{hp.author}</strong><br />
-        <em>{hp.date}</em>
+        <em>
+          {hp.date}
+          {hp.relatedLinks && hp.relatedLinks.map((link: { label: string; url: string }) => (
+            <>{' · '}<a href={link.url}>{link.label}</a></>
+          ))}
+        </em>
       </p>
+      {hp.paperUrl && (
+        <p class="essay-paper-link">
+          <a href={hp.paperUrl}>{hp.paperTitle}</a>
+        </p>
+      )}
     </header>
     <div class="essay-body">
       <HumorphicPartnership />
@@ -47,6 +57,16 @@ import { Content as HumorphicPartnership, frontmatter as hp } from '../../essays
     color: var(--ink-soft);
     margin: 0;
   }
+  .essay-section .essay-paper-link {
+    margin: 1rem 0 0;
+    padding: 0.6rem 0.9rem;
+    background: var(--bg-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.95rem;
+  }
+  .essay-section .essay-paper-link a { color: var(--ink); }
+  .essay-section .essay-paper-link a:hover { color: var(--accent); }
   .essay-body h2 {
     font-size: 1.5rem;
     margin: 2.75rem 0 0.75rem;
