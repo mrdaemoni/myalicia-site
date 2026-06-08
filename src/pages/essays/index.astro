@@ -53,6 +53,28 @@ const essays = [
   /* Essay rendering inside the long-page /essays layout. The .md file
      supplies h2…h6, blockquotes, footnotes etc.; we just tighten the
      visual rhythm here. */
+
+  /* Table of contents: one essay per line, scrolls to its section. */
+  .page-toc {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1.75rem 0 3rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--rule);
+  }
+  .page-toc a {
+    width: fit-content;
+    font-size: 1.05rem;
+    text-decoration: none;
+    color: var(--accent);
+  }
+  .page-toc a:hover {
+    text-decoration: underline;
+  }
+  html { scroll-behavior: smooth; }
+  .essay-section { scroll-margin-top: 1.5rem; }
+
   .essay-section .essay-header {
     margin: 0.5rem 0 2.5rem;
   }
