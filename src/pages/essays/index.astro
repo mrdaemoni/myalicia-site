@@ -1,6 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { Content as EmergenceEmergency, frontmatter as ee } from '../../essays/emergence-vs-emergency.md';
 import { Content as HumorphicPartnership, frontmatter as hp } from '../../essays/the-humorphic-partnership.md';
+
+const essays = [
+  { fm: ee, Body: EmergenceEmergency },
+  { fm: hp, Body: HumorphicPartnership },
+];
 ---
 <Base title="Essays — My Alicia">
   <h1>Essays</h1>
@@ -10,34 +16,37 @@ import { Content as HumorphicPartnership, frontmatter as hp } from '../../essays
   </p>
 
   <nav class="page-toc" aria-label="Essays on this page">
-    <a href={`#${hp.slug}`}>{hp.title}</a>
+    {essays.map(({ fm }) => (
+      <a href={`#${fm.slug}`}>{fm.title}</a>
+    ))}
   </nav>
 
-  <!-- ─────────────────────────────────────────────────────────── -->
-  <section id={hp.slug} class="essay-section">
-    <h2>{hp.title}</h2>
-    <header class="essay-header">
-      <p class="essay-dek"><em>{hp.dek}</em></p>
-      <p class="essay-meta">
-        <strong>{hp.author}</strong><br />
-        <em>
-          {hp.date}
-          {hp.relatedLinks && hp.relatedLinks.map((link: { label: string; url: string }) => (
-            <>{' · '}<a href={link.url}>{link.label}</a></>
-          ))}
-        </em>
-      </p>
-      {hp.paperUrl && (
-        <p class="essay-paper-link">
-          <a href={hp.paperUrl}>{hp.paperTitle}</a>
+  {essays.map(({ fm, Body }) => (
+    <section id={fm.slug} class="essay-section">
+      <h2>{fm.title}</h2>
+      <header class="essay-header">
+        <p class="essay-dek"><em>{fm.dek}</em></p>
+        <p class="essay-meta">
+          <strong>{fm.author}</strong><br />
+          <em>
+            {fm.date}
+            {fm.relatedLinks && fm.relatedLinks.map((link: { label: string; url: string }) => (
+              <>{' · '}<a href={link.url}>{link.label}</a></>
+            ))}
+          </em>
         </p>
-      )}
-    </header>
-    <div class="essay-body">
-      <HumorphicPartnership />
-    </div>
-    <p class="back-to-toc"><a href="#top">↑ Back to top</a></p>
-  </section>
+        {fm.paperUrl && (
+          <p class="essay-paper-link">
+            <a href={fm.paperUrl}>{fm.paperTitle}</a>
+          </p>
+        )}
+      </header>
+      <div class="essay-body">
+        <Body />
+      </div>
+      <p class="back-to-toc"><a href="#top">↑ Back to top</a></p>
+    </section>
+  ))}
 </Base>
 
 <style is:global>
@@ -67,6 +76,11 @@ import { Content as HumorphicPartnership, frontmatter as hp } from '../../essays
   }
   .essay-section .essay-paper-link a { color: var(--ink); }
   .essay-section .essay-paper-link a:hover { color: var(--accent); }
+  .essay-section + .essay-section {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--rule);
+  }
   .essay-body h2 {
     font-size: 1.5rem;
     margin: 2.75rem 0 0.75rem;
