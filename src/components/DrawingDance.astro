@@ -1,10 +1,12 @@
 ---
 /**
- * DrawingDance — a generative, animated line drawing.
- * Lines take the page's font colours (ink / ink-soft / accent) on the page
- * background, slowly weaving and shifting "like a dance". Seeded by `seed`
- * (usually the title or header text) so each drawing is distinct and reflects
- * the words above it. variant: "hero" | "card" | "header".
+ * DrawingDance — a generative, animated line drawing in Alicia's "strata" hand:
+ * layered horizontal contour lines (a horizon repeated — sediment, breath),
+ * with organic harmonic wobble, amplitude growing toward the bottom, mostly ink
+ * with an occasional accent line, and per-line transparency that slowly breathes.
+ * Drawn on the page background using the page's own font colours. Seeded by
+ * `seed` (title or header text) so each is distinct and reflects the words above.
+ * variant: "hero" | "card" | "header".
  */
 const { seed = 'alicia', variant = 'header' } = Astro.props;
 ---
@@ -18,14 +20,14 @@ const { seed = 'alicia', variant = 'header' } = Astro.props;
 
 <style is:global>
   .drawing-dance { display: block; width: 100%; pointer-events: none; }
-  .dance-card   { height: 120px; margin-top: 1.1rem; }
-  .dance-hero   { height: 140px; margin: 1.5rem 0 0.5rem; }
-  .dance-header { height: 52px; margin: 0.15rem 0 0.4rem; }
+  .dance-card   { height: 150px; margin-top: 1.25rem; }
+  .dance-hero   { height: 210px; margin: 1.75rem 0 0.5rem; }
+  .dance-header { height: 78px; margin: 0.2rem 0 0.5rem; }
   .dance-link   { display: block; }
   @media (max-width: 480px) {
-    .dance-card { height: 96px; }
-    .dance-hero { height: 110px; }
-    .dance-header { height: 44px; }
+    .dance-card { height: 118px; }
+    .dance-hero { height: 158px; }
+    .dance-header { height: 60px; }
   }
 </style>
 
@@ -53,8 +55,10 @@ const { seed = 'alicia', variant = 'header' } = Astro.props;
     };
     const lerp = (a, b, t) => a + (b - a) * t;
     const mix = (c1, c2, t) => [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c1[2], c2[2], t)];
+    const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 
     const css = getComputedStyle(document.documentElement);
+    // PAL: [ink (primary line), ink-soft (quiet mid line), accent (rare highlight)]
     const PAL = [
       css.getPropertyValue('--ink'),
       css.getPropertyValue('--ink-soft'),
@@ -68,28 +72,41 @@ const { seed = 'alicia', variant = 'header' } = Astro.props;
     function build(canvas) {
       const variant = canvas.dataset.variant || 'header';
       const rng = mulberry32(hashStr(canvas.dataset.seed || 'a'));
-      const n = variant === 'header' ? 3 : 4;
-      const threads = [];
-      for (let i = 0; i < n; i++) {
-        const sgn = () => (rng() < 0.5 ? -1 : 1);
-        threads.push({
-          baseY: 0.32 + rng() * 0.36,
-          amp: (variant === 'header' ? 0.08 : 0.12) + rng() * 0.10,
-          f0: 0.5 + rng() * 1.3,
-          f1: 1.1 + rng() * 2.2,
-          p0: rng() * 6.283,
-          p1: rng() * 6.283,
-          s0: (0.10 + rng() * 0.15) * sgn(),
-          s1: (0.08 + rng() * 0.12) * sgn(),
-          ca: i % 3,
-          cb: (i + 1 + (rng() * 2 | 0)) % 3,
-          ct: rng() * 6.283,
-          cs: 0.05 + rng() * 0.06,
-          w: (variant === 'header' ? 0.9 : 1.15) + rng() * 0.45,
-          a: (i === n - 1 ? 0.72 : 0.5) + rng() * 0.1,
+      // Richness scales with the band's height (more strata in taller bands).
+      const count = variant === 'hero' ? 22 : variant === 'card' ? 16 : 9;
+      const accentEvery = 6 + ((rng() * 4) | 0);     // 6..9: one accent line now and then
+      const accentPhase = (rng() * count) | 0;
+      const layers = [];
+      for (let li = 0; li < count; li++) {
+        if (rng() < 0.06) continue;                  // bare paper between bands
+        const f = count > 1 ? li / (count - 1) : 0;  // 0 top → 1 bottom
+        const H = [];
+        for (let k = 1; k <= 3; k++) {
+          H.push({
+            kf: k * (0.6 + rng() * 0.9),             // spatial frequency (cycles across width)
+            ph: rng() * 6.283,
+            dr: (0.035 + rng() * 0.11) * (rng() < 0.5 ? -1 : 1), // slow phase drift
+            am: (1 / k) * (0.6 + rng() * 0.5),
+          });
+        }
+        const isAccent = ((li + accentPhase) % accentEvery) === 0;
+        const ci = isAccent ? 2 : (li % 4 === 0 ? 1 : 0); // accent / soft / ink (mostly ink)
+        layers.push({
+          yFrac: 0.10 + 0.80 * ((li + 0.5) / count),
+          amp: 0.010 + 0.035 * f,                    // amplitude grows toward the bottom
+          slope: (rng() * 2 - 1) * 0.018,
+          H,
+          ci,
+          shift: isAccent && rng() < 0.55,           // a few accent lines slowly drift ink↔accent
+          a0: 0.40 + rng() * 0.34,                   // base transparency
+          am2: 0.08 + rng() * 0.13,                  // breathing amplitude
+          aSp: 0.09 + rng() * 0.20,                  // breathing speed (slow)
+          aPh: rng() * 6.283,
+          cSp: 0.04 + rng() * 0.04,
+          w: (variant === 'header' ? 0.9 : 1.15) + rng() * 0.5,
         });
       }
-      const d = { canvas, ctx: canvas.getContext('2d'), threads, w: 0, h: 0, vis: true };
+      const d = { canvas, ctx: canvas.getContext('2d'), layers, w: 0, h: 0, vis: true };
       const resize = () => {
         const r = canvas.getBoundingClientRect();
         d.w = Math.max(1, r.width); d.h = Math.max(1, r.height);
@@ -99,38 +116,48 @@ const { seed = 'alicia', variant = 'header' } = Astro.props;
       resize();
       window.addEventListener('resize', resize, { passive: true });
       if ('IntersectionObserver' in window) {
-        new IntersectionObserver((es) => { d.vis = es[0].isIntersecting; }, { rootMargin: '120px' }).observe(canvas);
+        new IntersectionObserver((es) => { d.vis = es[0].isIntersecting; }, { rootMargin: '140px' }).observe(canvas);
       }
       dances.push(d);
-      if (reduce) drawOne(d, 4.0);
+      if (reduce) drawOne(d, 6.0);
     }
 
     function drawOne(d, t) {
-      const { ctx, w, h, threads } = d;
+      const { ctx, w, h, layers } = d;
       ctx.clearRect(0, 0, w, h);
-      const steps = Math.max(24, Math.floor(w / 8));
-      for (const th of threads) {
-        const ph0 = th.p0 + t * th.s0;
-        const ph1 = th.p1 + t * th.s1;
-        const ctm = 0.5 - 0.5 * Math.cos(th.ct + t * th.cs);
-        const col = mix(PAL[th.ca], PAL[th.cb], ctm);
+      const steps = Math.max(22, Math.floor(w / 10));
+      for (const L of layers) {
+        let a = L.a0 + L.am2 * Math.sin(t * L.aSp + L.aPh);
+        a = clamp(a, 0.05, 0.88);
+        let col;
+        if (L.shift) {
+          const m = 0.5 - 0.5 * Math.cos(t * L.cSp + L.aPh);
+          col = mix(PAL[2], PAL[0], m);
+        } else col = PAL[L.ci];
         ctx.beginPath();
         for (let i = 0; i <= steps; i++) {
           const x = i / steps, px = x * w;
-          const y = (th.baseY + th.amp * (Math.sin(th.f0 * 6.283 * x + ph0) + 0.5 * Math.sin(th.f1 * 6.283 * x + ph1))) * h;
+          let wob = 0;
+          for (const hh of L.H) wob += hh.am * Math.sin(hh.kf * 6.283 * x + hh.ph + t * hh.dr);
+          wob /= L.H.length;
+          const y = (L.yFrac + L.amp * wob + L.slope * (x - 0.5)) * h;
           if (i) ctx.lineTo(px, y); else ctx.moveTo(px, y);
         }
-        ctx.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${th.a})`;
-        ctx.lineWidth = th.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${a.toFixed(3)})`;
+        ctx.lineWidth = L.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         ctx.stroke();
       }
     }
 
-    let start = null;
+    let start = null, last = 0;
     function loop(ts) {
       if (start === null) start = ts;
-      const t = (ts - start) / 1000;
-      for (const d of dances) if (d.vis) drawOne(d, t);
+      // ~30fps is plenty for a slow horizon, and lighter on many bands.
+      if (ts - last >= 33) {
+        last = ts;
+        const t = (ts - start) / 1000;
+        for (const d of dances) if (d.vis) drawOne(d, t);
+      }
       requestAnimationFrame(loop);
     }
 
