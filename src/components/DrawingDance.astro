@@ -18,8 +18,16 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
   .dance-hero   { height: 380px; margin: 1.5rem 0 0.5rem; }
   .dance-header { height: 150px; margin: 0.2rem 0 0.7rem; }
   .dance-link   { display: block; }
+  /* Section headers: the dance is a bleed background behind the subtitle. */
+  .dance-h2-wrap { position: relative; margin: 2.6rem 0 0.5rem; min-height: 150px; }
+  .dance-h2-wrap .drawing-dance.dance-header { position: absolute; inset: 0; height: 100%; margin: 0; z-index: 0; }
+  .dance-h2-wrap > h2 {
+    position: relative; z-index: 1; margin: 0 !important; padding-top: 0.3rem;
+    text-shadow: 0 0 10px var(--bg), 0 0 5px var(--bg), 0 1px 0 var(--bg);
+  }
   @media (max-width: 480px) {
     .dance-card { height: 170px; } .dance-hero { height: 280px; } .dance-header { height: 116px; }
+    .dance-h2-wrap { min-height: 116px; }
   }
 </style>
 
@@ -117,9 +125,9 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
       // a floor / foundation
       if (s.includes('philosophical floor') || s.includes('floor'))
         return { accentEvery: 9, seedBias: 'uniform', centers: [[0.5, 0.5]], modes: [ { type: 'horizon', base: 0.9, osc: 0.1, sp: 0.03, ph: 0 } ] };
-      // coda / becoming more human — organic: two gentle currents intertwining and breathing upward
+      // coda / becoming more human — organic human figures, gesture-sketched, leaning together
       if (s.includes('coda') || s.includes('becoming more human'))
-        return { accentEvery: 7, seedBias: 'lower', organic: true, centers: [[0.5, 0.5]], modes: [ { type: 'swirl', base: 0.58, osc: 0.34, sp: 0.045, ph: 0 }, { type: 'rise', base: 0.4, osc: 0, sp: 0.04, ph: 0 } ] };
+        return { accentEvery: 7, figures: true, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [ { type: 'rise', base: 1, osc: 0, sp: 0.04, ph: 0 } ] };
       // footnotes — muted dots / sparks drifting in the margin
       if (s.includes('footnote'))
         return { accentEvery: 9, seedBias: 'uniform', density: 0.7, faint: true, dots: true, speed: 0.0022, centers: [[0.5, 0.5]], modes: [ { type: 'settle', base: 0.7, osc: 0.1, sp: 0.02, ph: 0 } ] };
@@ -133,6 +141,59 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
       return [0.05 + rng() * 0.90, 0.06 + rng() * 0.88];
     }
 
+    // ── human figures (Coda): a small row of gesture-sketched people leaning together ──
+    // Strokes store [dx, y]: dx is an x-offset from the figure's centre, in HEIGHT units,
+    // so aspect correction at draw time keeps heads round on a wide, short canvas.
+    function silhouette(s, lean) {
+      const hw = 0.05 * s, sw = 0.085 * s, nw = 0.018 * s, hr = 0.062 * s;
+      const yF = 0.96, yS = 0.55, yN = 0.46, yH = 0.355;
+      const lx = (y) => lean * (0.58 - y); // upper body leans toward neighbour
+      const line = (ax, ay, bx, by, n) => { const p = []; for (let i = 0; i <= n; i++) { const u = i / n; p.push([ax + (bx - ax) * u, ay + (by - ay) * u]); } return p; };
+      const left = line(-hw + lx(yF), yF, -sw + lx(yS), yS, 12).concat(line(-sw + lx(yS), yS, -nw + lx(yN), yN, 4));
+      const right = line(nw + lx(yN), yN, sw + lx(yS), yS, 4).concat(line(sw + lx(yS), yS, hw + lx(yF), yF, 12));
+      const head = []; const hdx = lx(yH);
+      for (let i = 0; i <= 30; i++) { const a = TAU * i / 30; head.push([hdx + hr * Math.cos(a), yH + hr * Math.sin(a)]); }
+      return [left, right, head];
+    }
+    function buildFigures(rng, smallV) {
+      const n = smallV ? 4 : 5; const arr = [];
+      for (let i = 0; i < n; i++) {
+        const cx = 0.20 + 0.60 * (n === 1 ? 0.5 : i / (n - 1));
+        const s = 1.05 + rng() * 0.25;
+        const dir = i < (n - 1) / 2 ? 1 : (i > (n - 1) / 2 ? -1 : 0);
+        const lean = dir * (0.035 + rng() * 0.03); // tilt toward the centre = together
+        arr.push({ cx, s, lean, phase: rng() * TAU, ci: i % 4 === 1 ? 2 : (i % 2 ? 1 : 0), strokes: silhouette(s, lean) });
+      }
+      return arr;
+    }
+    function drawFigures(d, t) {
+      const { ctx, w, hpx, figs } = d;
+      ctx.clearRect(0, 0, w, hpx);
+      const k = hpx / w; // height units -> x-normalized, so circles stay circular
+      for (const f of figs) {
+        const cxp = f.cx * w;
+        for (let sIdx = 0; sIdx < f.strokes.length; sIdx++) {
+          const base = f.strokes[sIdx];
+          for (let p = 0; p < 4; p++) {
+            const col = p === 0 ? PAL[f.ci] : PAL[f.ci === 2 ? 1 : (p % 2 ? 1 : 0)];
+            let a = 0.08 + 0.05 * p + 0.03 * Math.sin(t * 0.6 + f.phase + p);
+            a = clamp(a, 0.035, 0.22);
+            const amp = 0.006 + 0.003 * p; // jitter in height units
+            ctx.beginPath();
+            for (let i = 0; i < base.length; i++) {
+              const jx = amp * Math.sin(i * 0.9 + t * 0.8 + p * 1.7 + f.phase);
+              const jy = amp * Math.cos(i * 0.7 + t * 0.7 + p * 2.1 + f.phase);
+              const X = cxp + (base[i][0] + jx) * hpx;       // x-offset scaled by height px
+              const Y = (base[i][1] + jy) * hpx;
+              if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+            }
+            ctx.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${a.toFixed(3)})`;
+            ctx.lineWidth = 1.0; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
+          }
+        }
+      }
+    }
+
     function build(canvas) {
       const variant = canvas.dataset.variant || 'header';
       const seed = canvas.dataset.seed || 'a';
@@ -144,13 +205,14 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
       P = Math.round(P);
       const speed = rec.speed || 0.0058;
       const faint = rec.faint ? 0.6 : 1;
-      const dots = !!rec.dots, organic = !!rec.organic;
+      const dots = !!rec.dots, organic = !!rec.organic, figures = !!rec.figures;
+      const figs = figures ? buildFigures(rng, small) : null;
       const parts = [];
       const spawn = (p) => {
         const q = seedPos(rng, rec.seedBias);
         p.x = q[0]; p.y = q[1]; p.tr = [q[0], q[1]]; p.life = 50 + (rng() * 120 | 0);
       };
-      for (let i = 0; i < P; i++) {
+      for (let i = 0; !figures && i < P; i++) {
         const isAccent = (i % rec.accentEvery) === (rng() * rec.accentEvery | 0);
         const p = { ci: dots ? (isAccent ? 2 : 1) : (isAccent ? 2 : (i % 5 === 0 ? 1 : 0)), shift: isAccent && rng() < 0.5,
           a0: dots ? (0.14 + rng() * 0.16) : (((variant === 'header' ? 0.22 : 0.15) + rng() * (variant === 'header' ? 0.18 : 0.16)) * faint),
@@ -159,7 +221,7 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
           w: dots ? 0.9 + rng() * 1.4 : 0.7 + rng() * 0.4, tr: [] };
         spawn(p); p.life = (rng() * 170 | 0) + 10; parts.push(p);
       }
-      const d = { canvas, ctx: canvas.getContext('2d'), rec, parts, L, speed, spawn, dots, w: 0, hpx: 0, vis: true };
+      const d = { canvas, ctx: canvas.getContext('2d'), rec, parts, L, speed, spawn, dots, figures, figs, w: 0, hpx: 0, vis: true };
       const resize = () => { const r = canvas.getBoundingClientRect(); d.w = Math.max(1, r.width); d.hpx = Math.max(1, r.height); canvas.width = Math.round(d.w * dpr); canvas.height = Math.round(d.hpx * dpr); d.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
       resize(); window.addEventListener('resize', resize, { passive: true });
       if ('IntersectionObserver' in window) new IntersectionObserver((es) => { d.vis = es[0].isIntersecting; }, { rootMargin: '160px' }).observe(canvas);
@@ -169,6 +231,7 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
 
     function stepDraw(d, t, advanceOnly) {
       const { ctx, w, hpx, rec, parts, L, speed, spawn, dots } = d;
+      if (d.figures) { if (!advanceOnly) drawFigures(d, t); return; }
       const g = rec.pulse ? (1 - rec.pulse.depth * 0.5 * (1 + Math.sin(t * rec.pulse.sp))) : 1;
       if (!advanceOnly) ctx.clearRect(0, 0, w, hpx);
       for (const p of parts) {
@@ -204,9 +267,12 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
       document.querySelectorAll('canvas[data-dance]').forEach(build);
       const body = document.querySelector('.essay-body');
       if (body) body.querySelectorAll('h2').forEach((hd) => {
+        const wrap = document.createElement('div'); wrap.className = 'dance-h2-wrap';
+        hd.parentNode.insertBefore(wrap, hd);
         const c = document.createElement('canvas'); c.className = 'drawing-dance dance-header'; c.setAttribute('data-dance', ''); c.setAttribute('aria-hidden', 'true');
         c.dataset.variant = 'header'; c.dataset.seed = (hd.textContent || 'section').slice(0, 80);
-        hd.insertAdjacentElement('afterend', c); build(c);
+        wrap.appendChild(c); wrap.appendChild(hd); // dance becomes a bleed background behind the subtitle
+        build(c);
       });
       if (!reduce) requestAnimationFrame(loop);
     }

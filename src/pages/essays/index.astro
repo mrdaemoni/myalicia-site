@@ -20,11 +20,13 @@ const essays = [ee, hp];
   <ul class="essay-list">
     {essays.map((fm) => (
       <li class="essay-list-item">
-        <a class="essay-list-title" href={`/essays/${fm.slug}/`}>{fm.title}</a>
-        <p class="essay-list-dek">{fm.dek}</p>
-        <p class="essay-list-meta">{fm.date}</p>
-        <a class="dance-link" href={`/essays/${fm.slug}/`} aria-label={`Read ${fm.title}`} tabindex="-1">
+        <a class="essay-list-link" href={`/essays/${fm.slug}/`} aria-label={`Read ${fm.title}`}>
           <DrawingDance seed={fm.title} variant="card" />
+          <div class="essay-list-content">
+            <span class="essay-list-title">{fm.title}</span>
+            <span class="essay-list-dek">{fm.dek}</span>
+            <span class="essay-list-meta">{fm.date}</span>
+          </div>
         </a>
       </li>
     ))}
@@ -38,29 +40,46 @@ const essays = [ee, hp];
     padding: 0;
   }
   .essay-list-item {
-    padding: 1.75rem 0;
     border-top: 1px solid var(--rule);
   }
   .essay-list-item:last-child {
     border-bottom: 1px solid var(--rule);
   }
+  /* Whole card is a link; the dance is a full-bleed background and the
+     title/dek/date float on top, so the ink bleeds up around the words. */
+  .essay-list-link {
+    display: block;
+    position: relative;
+    min-height: 300px;
+    padding: 1.75rem 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  .essay-list-link .drawing-dance.dance-card {
+    position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; z-index: 0;
+  }
+  .essay-list-content { position: relative; z-index: 1; display: block; }
+  .essay-list-title,
+  .essay-list-dek,
+  .essay-list-meta { text-shadow: 0 0 10px var(--bg), 0 0 4px var(--bg), 0 1px 0 var(--bg); }
   .essay-list-title {
+    display: block;
     font-size: 1.6rem;
     font-weight: 600;
     line-height: 1.25;
     letter-spacing: -0.01em;
     color: var(--ink);
-    text-decoration: none;
   }
-  .essay-list-title:hover { color: var(--accent); text-decoration: none; }
+  .essay-list-link:hover .essay-list-title { color: var(--accent); }
   .essay-list-dek {
+    display: block;
     font-size: 1.05rem;
     color: var(--ink-soft);
     margin: 0.5rem 0 0.4rem;
   }
   .essay-list-meta {
+    display: block;
     font-size: 0.9rem;
     color: var(--ink-soft);
-    margin: 0;
   }
 </style>
