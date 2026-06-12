@@ -117,11 +117,12 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
       // a floor / foundation
       if (s.includes('philosophical floor') || s.includes('floor'))
         return { accentEvery: 9, seedBias: 'uniform', centers: [[0.5, 0.5]], modes: [ { type: 'horizon', base: 0.9, osc: 0.1, sp: 0.03, ph: 0 } ] };
-      // coda / settling / footnotes (faint margin)
+      // coda / becoming more human — organic: two gentle currents intertwining and breathing upward
       if (s.includes('coda') || s.includes('becoming more human'))
-        return { accentEvery: 9, seedBias: 'uniform', centers: [[0.5, 0.5]], modes: [ { type: 'settle', base: 0.9, osc: 0.15, sp: 0.03, ph: 0 } ] };
+        return { accentEvery: 7, seedBias: 'lower', organic: true, centers: [[0.5, 0.5]], modes: [ { type: 'swirl', base: 0.58, osc: 0.34, sp: 0.045, ph: 0 }, { type: 'rise', base: 0.4, osc: 0, sp: 0.04, ph: 0 } ] };
+      // footnotes — muted dots / sparks drifting in the margin
       if (s.includes('footnote'))
-        return { accentEvery: 12, seedBias: 'uniform', density: 0.4, faint: true, centers: [[0.5, 0.5]], modes: [ { type: 'settle', base: 0.95, osc: 0.05, sp: 0.025, ph: 0 } ] };
+        return { accentEvery: 9, seedBias: 'uniform', density: 0.7, faint: true, dots: true, speed: 0.0022, centers: [[0.5, 0.5]], modes: [ { type: 'settle', base: 0.7, osc: 0.1, sp: 0.02, ph: 0 } ] };
       return { accentEvery: 8 + (rng() * 3 | 0), seedBias: 'uniform', centers: [[r(0.4, 0.6), r(0.4, 0.6)]], modes: [ { type: 'horizon', base: r(0.5, 0.75), osc: r(0.3, 0.5), sp: r(0.035, 0.06), ph: r(0, 6) }, { type: 'swirl', base: r(0.25, 0.45), osc: r(0.3, 0.5), sp: r(0.04, 0.06), ph: r(0, 6) } ] };
     }
     function seedPos(rng, bias) {
@@ -141,8 +142,9 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
       let L = variant === 'hero' ? 26 : variant === 'card' ? 22 : 18;
       if (small) P = Math.round(P * 0.6);
       P = Math.round(P);
-      const speed = 0.0058;
+      const speed = rec.speed || 0.0058;
       const faint = rec.faint ? 0.6 : 1;
+      const dots = !!rec.dots, organic = !!rec.organic;
       const parts = [];
       const spawn = (p) => {
         const q = seedPos(rng, rec.seedBias);
@@ -150,13 +152,14 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
       };
       for (let i = 0; i < P; i++) {
         const isAccent = (i % rec.accentEvery) === (rng() * rec.accentEvery | 0);
-        const p = { ci: isAccent ? 2 : (i % 5 === 0 ? 1 : 0), shift: isAccent && rng() < 0.5,
-          a0: ((variant === 'header' ? 0.22 : 0.15) + rng() * (variant === 'header' ? 0.18 : 0.16)) * faint,
-          am: 0.05 + rng() * 0.08, asp: 0.08 + rng() * 0.18, aph: rng() * TAU, csp: 0.04 + rng() * 0.04,
-          w: 0.7 + rng() * 0.4, tr: [] };
+        const p = { ci: dots ? (isAccent ? 2 : 1) : (isAccent ? 2 : (i % 5 === 0 ? 1 : 0)), shift: isAccent && rng() < 0.5,
+          a0: dots ? (0.14 + rng() * 0.16) : (((variant === 'header' ? 0.22 : 0.15) + rng() * (variant === 'header' ? 0.18 : 0.16)) * faint),
+          am: (organic ? 0.10 + rng() * 0.12 : dots ? 0.14 + rng() * 0.18 : 0.05 + rng() * 0.08),
+          asp: (dots ? 0.5 + rng() * 1.1 : 0.08 + rng() * 0.18), aph: rng() * TAU, csp: 0.04 + rng() * 0.04,
+          w: dots ? 0.9 + rng() * 1.4 : 0.7 + rng() * 0.4, tr: [] };
         spawn(p); p.life = (rng() * 170 | 0) + 10; parts.push(p);
       }
-      const d = { canvas, ctx: canvas.getContext('2d'), rec, parts, L, speed, spawn, w: 0, hpx: 0, vis: true };
+      const d = { canvas, ctx: canvas.getContext('2d'), rec, parts, L, speed, spawn, dots, w: 0, hpx: 0, vis: true };
       const resize = () => { const r = canvas.getBoundingClientRect(); d.w = Math.max(1, r.width); d.hpx = Math.max(1, r.height); canvas.width = Math.round(d.w * dpr); canvas.height = Math.round(d.hpx * dpr); d.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
       resize(); window.addEventListener('resize', resize, { passive: true });
       if ('IntersectionObserver' in window) new IntersectionObserver((es) => { d.vis = es[0].isIntersecting; }, { rootMargin: '160px' }).observe(canvas);
@@ -165,7 +168,7 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
     }
 
     function stepDraw(d, t, advanceOnly) {
-      const { ctx, w, hpx, rec, parts, L, speed, spawn } = d;
+      const { ctx, w, hpx, rec, parts, L, speed, spawn, dots } = d;
       const g = rec.pulse ? (1 - rec.pulse.depth * 0.5 * (1 + Math.sin(t * rec.pulse.sp))) : 1;
       if (!advanceOnly) ctx.clearRect(0, 0, w, hpx);
       for (const p of parts) {
@@ -173,6 +176,15 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
         p.x += speed * v[0]; p.y += speed * v[1]; p.life--;
         const off = p.x < -0.06 || p.x > 1.06 || p.y < -0.12 || p.y > 1.12;
         if (p.life <= 0 || off) { spawn(p); continue; }
+        if (dots) { // muted spark: a drifting dot that twinkles
+          if (advanceOnly) continue;
+          let a = (p.a0 + p.am * Math.sin(t * p.asp + p.aph)) * g;
+          a = clamp(a, 0.0, 0.4); if (a < 0.015) continue;
+          const col = PAL[p.ci];
+          ctx.beginPath(); ctx.arc(p.x * w, p.y * hpx, p.w, 0, TAU);
+          ctx.fillStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${a.toFixed(3)})`; ctx.fill();
+          continue;
+        }
         p.tr.push(p.x, p.y);
         if (p.tr.length > L * 2) { p.tr.splice(0, 2); }
         if (advanceOnly || p.tr.length < 4) continue;

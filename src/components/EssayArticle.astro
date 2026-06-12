@@ -5,31 +5,48 @@ import DrawingDance from './DrawingDance.astro';
 const { fm, Body } = Astro.props;
 ---
 <article id={fm.slug} class="essay-section">
-  <h1>{fm.title}</h1>
-  <header class="essay-header">
-    <p class="essay-dek"><em>{fm.dek}</em></p>
-    <p class="essay-meta">
-      <strong>{fm.author}</strong><br />
-      <em>
-        {fm.date}
-        {fm.relatedLinks && fm.relatedLinks.map((link: { label: string; url: string }) => (
-          <>{' · '}<a href={link.url}>{link.label}</a></>
-        ))}
-      </em>
-    </p>
-    {fm.paperUrl && (
-      <p class="essay-paper-link">
-        <a href={fm.paperUrl}>{fm.paperTitle}</a>
-      </p>
-    )}
-  </header>
-  <DrawingDance seed={fm.title} variant="hero" />
+  <div class="essay-hero-stage">
+    <DrawingDance seed={fm.title} variant="hero" />
+    <div class="essay-hero-content">
+      <h1>{fm.title}</h1>
+      <header class="essay-header">
+        <p class="essay-dek"><em>{fm.dek}</em></p>
+        <p class="essay-meta">
+          <strong>{fm.author}</strong><br />
+          <em>
+            {fm.date}
+            {fm.relatedLinks && fm.relatedLinks.map((link: { label: string; url: string }) => (
+              <>{' · '}<a href={link.url}>{link.label}</a></>
+            ))}
+          </em>
+        </p>
+        {fm.paperUrl && (
+          <p class="essay-paper-link">
+            <a href={fm.paperUrl}>{fm.paperTitle}</a>
+          </p>
+        )}
+      </header>
+    </div>
+  </div>
   <div class="essay-body">
     <Body />
   </div>
 </article>
 
 <style is:global>
+  /* Hero: the dance is a full-bleed background; the title block floats on top,
+     so the ink bleeds up and around the words instead of sitting in a box. */
+  .essay-hero-stage { position: relative; min-height: 560px; margin: 0 0 1rem; }
+  .essay-hero-stage .drawing-dance.dance-hero {
+    position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; z-index: 0;
+  }
+  .essay-hero-content { position: relative; z-index: 1; padding-top: 0.5rem; }
+  .essay-hero-content h1,
+  .essay-hero-content .essay-dek,
+  .essay-hero-content .essay-meta {
+    text-shadow: 0 0 10px var(--bg), 0 0 4px var(--bg), 0 1px 0 var(--bg);
+  }
+  @media (max-width: 480px) { .essay-hero-stage { min-height: 440px; } }
   .essay-section h1 { margin-bottom: 0.5rem; }
   .essay-section .essay-header { margin: 0.5rem 0 2.5rem; }
   .essay-section .essay-dek { font-size: 1.15rem; color: var(--ink-soft); margin: 0 0 0.75rem; }
