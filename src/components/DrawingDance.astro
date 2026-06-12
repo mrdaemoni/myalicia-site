@@ -1,49 +1,32 @@
 ---
 /**
- * DrawingDance — "Alicia's ink": a generative flow-field of streamlines on the
- * page background, in the page's own font colours with breathing transparency.
- * The vector field is a blend of named motifs whose weights slowly oscillate,
- * so the drawing morphs from one shape to another — a slow, living dance that
+ * DrawingDance — "Alicia's ink": a flowing particle field on the page
+ * background, in the page's own font colours. Particles advect along a vector
+ * field and leave short ink trails, so the drawing genuinely moves and morphs.
+ * A per-title "recipe" picks the field motifs + choreography so the dance
  * answers the words above it.
  *
- * Motifs: horizon, rise, turbulent, fork, braid, swirl, wave, radial.
- * A per-title "recipe" picks motifs + choreography. Pass `recipe` explicitly or
- * let it derive from `seed` (the title / header text).
- *
- * variant: "hero" | "card" | "header"
+ * variant: "hero" | "card" | "header". Pass `recipe` to override the seed.
  */
 const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
 ---
-<canvas
-  class={`drawing-dance dance-${variant}`}
-  data-dance data-seed={seed} data-variant={variant} data-recipe={recipe}
-  aria-hidden="true"
-></canvas>
+<canvas class={`drawing-dance dance-${variant}`} data-dance data-seed={seed} data-variant={variant} data-recipe={recipe} aria-hidden="true"></canvas>
 
 <style is:global>
   .drawing-dance { display: block; width: 100%; pointer-events: none; }
   .dance-card   { height: 220px; margin-top: 1.25rem; }
   .dance-hero   { height: 380px; margin: 1.5rem 0 0.5rem; }
-  .dance-header { height: 130px; margin: 0.2rem 0 0.6rem; }
+  .dance-header { height: 150px; margin: 0.2rem 0 0.7rem; }
   .dance-link   { display: block; }
   @media (max-width: 480px) {
-    .dance-card { height: 170px; }
-    .dance-hero { height: 280px; }
-    .dance-header { height: 104px; }
+    .dance-card { height: 170px; } .dance-hero { height: 280px; } .dance-header { height: 116px; }
   }
 </style>
 
 <script>
   (function () {
-    if (window.__danceInit) return;
-    window.__danceInit = true;
-
-    const mulberry32 = (a) => () => {
-      a |= 0; a = (a + 0x6d2b79f5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
+    if (window.__danceInit) return; window.__danceInit = true;
+    const mulberry32 = (a) => () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
     const hashStr = (s) => { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
     const hex2rgb = (h) => { h = (h || '').replace('#', '').trim(); if (h.length === 3) h = h.split('').map((c) => c + c).join(''); const n = parseInt(h || '333333', 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
     const lerp = (a, b, t) => a + (b - a) * t;
@@ -51,7 +34,6 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
     const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
     const smooth = (a, b, x) => { let t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
     const TAU = 6.28318530718;
-
     const css = getComputedStyle(document.documentElement);
     const PAL = [css.getPropertyValue('--ink'), css.getPropertyValue('--ink-soft'), css.getPropertyValue('--accent')].map(hex2rgb);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -59,103 +41,94 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const dances = [];
 
-    // ── motifs (y: 0 = top, 1 = bottom; dy < 0 = upward / "coming up") ──
+    // ── field primitives (y:0 top, 1 bottom; dy<0 = up) ──
     function modeDir(type, x, y, t, ph) {
       let dx, dy;
       switch (type) {
-        case 'horizon':
-          dx = 1; dy = 0.28 * Math.sin(TAU * 1.4 * y + 0.30 * t + ph) + 0.10 * Math.sin(TAU * 0.6 * x - 0.20 * t); break;
-        case 'wave':
-          dx = 1; dy = 0.7 * Math.sin(TAU * 1.05 * x + 0.42 * t + ph); break;
-        case 'rise': // smooth, safe, coming up
-          dx = 0.13 * Math.sin(TAU * 0.8 * y + 0.18 * t + ph); dy = -1; break;
-        case 'turbulent': { // erratic, stressful churn — very high spatial frequency so streamlines jag and tremble
-          const a = 3.0 * Math.sin(22.0 * y + 2.6 * t + ph) + 2.6 * Math.cos(20.0 * x - 1.9 * t) + 2.1 * Math.sin(33.0 * (x + 0.6 * y) + 1.6 * t) + 1.4 * Math.sin(50.0 * x - 14.0 * y + 0.9 * t);
-          dx = Math.cos(a); dy = Math.sin(a); break;
-        }
-        case 'swirl': {
-          const a = 1.7 * Math.sin(3.6 * y + 0.22 * t) + 1.5 * Math.cos(2.7 * x - 0.17 * t + ph) + 0.7 * Math.sin(2.1 * (x + y) + 0.10 * t);
-          dx = Math.cos(a); dy = Math.sin(a); break;
-        }
-        case 'fork': { // one stream comes in and separates into two
-          const splitY = 0.52;
-          const sgn = (x >= 0.5) ? 1 : -1;
-          const upper = 1 - smooth(splitY - 0.10, splitY + 0.12, y); // 1 near top, 0 near bottom
-          const target = lerp(0.5, 0.5 + 0.26 * sgn, upper);
-          dx = (target - x) * 1.7 + 0.05 * Math.sin(TAU * y + 0.3 * t + ph);
-          dy = -1; break;
-        }
+        case 'horizon': dx = 1; dy = 0.26 * Math.sin(TAU * 1.4 * y + 0.30 * t + ph) + 0.10 * Math.sin(TAU * 0.6 * x - 0.20 * t); break;
+        case 'settle':  dx = 1; dy = 0.16 * Math.sin(TAU * 1.1 * y + 0.12 * t + ph); break;
+        case 'wave':    dx = 1; dy = 0.7 * Math.sin(TAU * 1.05 * x + 0.42 * t + ph); break;
+        case 'rise':    dx = 0.13 * Math.sin(TAU * 0.8 * y + 0.18 * t + ph); dy = -1; break;
+        case 'fall':    dx = 0.18 * Math.sin(9.0 * y + 1.2 * t + ph); dy = 1; break;
+        case 'woven':   dx = 1; dy = 0.62 * Math.sin(TAU * 2.2 * x + (Math.floor(y * 6) % 2 ? Math.PI : 0) + 0.3 * t + ph); break;
+        case 'turbulent': { const a = 3.0 * Math.sin(22.0 * y + 2.6 * t + ph) + 2.6 * Math.cos(20.0 * x - 1.9 * t) + 2.1 * Math.sin(33.0 * (x + 0.6 * y) + 1.6 * t) + 1.4 * Math.sin(50.0 * x - 14.0 * y + 0.9 * t); dx = Math.cos(a); dy = Math.sin(a); break; }
+        case 'swirl': { const a = 1.7 * Math.sin(3.6 * y + 0.22 * t) + 1.5 * Math.cos(2.7 * x - 0.17 * t + ph) + 0.7 * Math.sin(2.1 * (x + y) + 0.10 * t); dx = Math.cos(a); dy = Math.sin(a); break; }
+        case 'fork': { const splitY = 0.52, sgn = (x >= 0.5) ? 1 : -1; const upper = 1 - smooth(splitY - 0.10, splitY + 0.12, y); const target = lerp(0.5, 0.5 + 0.26 * sgn, upper); dx = (target - x) * 1.7 + 0.05 * Math.sin(TAU * y + 0.3 * t + ph); dy = -1; break; }
         default: dx = 1; dy = 0;
-      }
-      const m = Math.hypot(dx, dy) || 1;
-      return [dx / m, dy / m];
-    }
-    function vortexDir(x, y, centers, braid) {
-      let dx = 0, dy = 0;
-      for (let i = 0; i < centers.length; i++) {
-        const c = centers[i], sgn = (braid && (i & 1)) ? -1 : 1;
-        const rx = x - c[0], ry = y - c[1], r2 = rx * rx + ry * ry + 0.02;
-        dx += sgn * (-ry) / r2; dy += sgn * (rx) / r2;
       }
       const m = Math.hypot(dx, dy) || 1; return [dx / m, dy / m];
     }
-    function field(x, y, t, rec) {
+    function fieldDir(x, y, t, rec) {
       let vx = 0, vy = 0;
       for (const md of rec.modes) {
         const w = Math.max(0, md.base + md.osc * 0.5 * (1 + Math.sin(t * md.sp + md.ph)));
         if (w <= 0.001) continue;
-        const d = (md.type === 'braid' || md.type === 'radial')
-          ? vortexDir(x, y, rec.centers, md.type === 'braid')
-          : modeDir(md.type, x, y, t, md.ph);
-        vx += w * d[0]; vy += w * d[1];
+        let dx, dy;
+        if (md.type === 'braid' || md.type === 'radial') {
+          dx = 0; dy = 0;
+          for (let i = 0; i < rec.centers.length; i++) {
+            const c = rec.centers[i], sgn = (md.type === 'braid' && (i & 1)) ? -1 : 1;
+            const rx = x - c[0], ry = y - c[1], r2 = rx * rx + ry * ry + 0.02;
+            dx += sgn * (-ry) / r2; dy += sgn * (rx) / r2;
+          }
+          const m = Math.hypot(dx, dy) || 1; dx /= m; dy /= m;
+        } else if (md.type === 'radialOut') {
+          const c = rec.centers[0]; const rx = x - c[0], ry = y - c[1]; const m = Math.hypot(rx, ry) || 1; dx = rx / m; dy = ry / m;
+        } else { const d = modeDir(md.type, x, y, t, md.ph); dx = d[0]; dy = d[1]; }
+        vx += w * dx; vy += w * dy;
       }
-      return [vx, vy];
+      const m = Math.hypot(vx, vy); if (m < 1e-4) return [0.0001, -0.0001];
+      return [vx / m, vy / m];
     }
 
-    // ── recipes: the "prompt" — each answers the concept of its words ──
+    // ── recipes: one per concept ──
+    const NUM = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7 };
+    function braidN(n) { const c = []; for (let i = 0; i < n; i++) c.push([(i + 1) / (n + 1), 0.5 + (i % 2 ? -0.06 : 0.06)]); return c; }
     function recipeFor(seed, explicit) {
-      const rng = mulberry32(hashStr(seed));
-      const s = (explicit || seed || '').toLowerCase();
-      const r = (a, b) => a + (b - a) * rng();
-      // Emergence vs. Emergency: comes up smooth & safe, then morphs erratic & stressful.
+      const rng = mulberry32(hashStr(seed)); const s = (explicit || seed || '').toLowerCase(); const r = (a, b) => a + (b - a) * rng();
+      // Conditions one..six — one connected family: a braid that gains a strand each time.
+      const cm = s.match(/condition\s+(one|two|three|four|five|six|seven|\d)/);
+      if (cm) {
+        const n = NUM[cm[1]] || parseInt(cm[1]) || 1;
+        return { accentEvery: 6, seedBias: 'uniform', centers: braidN(n), modes: [
+          { type: 'braid', base: 0.8, osc: 0.22, sp: 0.04, ph: 0 },
+          { type: 'swirl', base: 0.22, osc: 0.2, sp: 0.05, ph: n } ] };
+      }
       if (s.includes('emergence') || s.includes('emergency'))
-        return { accentEvery: 8, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [
-          { type: 'rise',      base: 0.85, osc: 0.0,  sp: 0.04, ph: 0 },
-          { type: 'turbulent', base: 0.05, osc: 1.7,  sp: 0.23, ph: 0 } ] };
-      // The fork: one stream comes in and separates into two.
+        return { accentEvery: 8, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [ { type: 'rise', base: 0.85, osc: 0, sp: 0.04, ph: 0 }, { type: 'turbulent', base: 0.05, osc: 1.7, sp: 0.23, ph: 0 } ] };
       if (s.includes('fork'))
-        return { accentEvery: 6, seedBias: 'forkbase', centers: [[0.5, 0.5]], modes: [
-          { type: 'fork', base: 1.0, osc: 0.0, sp: 0.05, ph: 0 } ] };
-      // The Humorphic Partnership: two centres whose streamlines braid together.
+        return { accentEvery: 6, seedBias: 'forkbase', centers: [[0.5, 0.5]], modes: [ { type: 'fork', base: 1, osc: 0, sp: 0.05, ph: 0 } ] };
       if (s.includes('humorphic') || s.includes('partnership'))
-        return { accentEvery: 7, seedBias: 'uniform', centers: [[0.36, 0.52], [0.64, 0.48]], modes: [
-          { type: 'braid', base: 0.75, osc: 0.30, sp: 0.04, ph: 0 },
-          { type: 'swirl', base: 0.28, osc: 0.30, sp: 0.05, ph: 2.0 } ] };
-      // section-header temperaments
-      if (s.includes('broke') || s.includes('silence') || s.includes('collapse') || s.includes('dark'))
-        return { accentEvery: 9, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [
-          { type: 'rise',      base: 0.55, osc: 0.0,  sp: 0.04, ph: 0 },
-          { type: 'turbulent', base: 0.45, osc: 0.6,  sp: 0.20, ph: r(0, 6) } ] };
-      if (s.includes('trust') || s.includes('engineering'))
-        return { accentEvery: 9, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [
-          { type: 'rise',    base: 0.85, osc: 0.0,  sp: 0.04, ph: 0 },
-          { type: 'horizon', base: 0.20, osc: 0.15, sp: 0.04, ph: r(0, 6) } ] };
+        return { accentEvery: 7, seedBias: 'uniform', centers: [[0.36, 0.52], [0.64, 0.48]], modes: [ { type: 'braid', base: 0.75, osc: 0.3, sp: 0.04, ph: 0 }, { type: 'swirl', base: 0.28, osc: 0.3, sp: 0.05, ph: 2 } ] };
+      // collapse / silence / breaking
+      if (s.includes('broke') || s.includes('gone wrong') || s.includes('silence') || s.includes('collapse'))
+        return { accentEvery: 9, seedBias: 'upper', centers: [[0.5, 0.5]], pulse: { sp: 0.2, depth: 0.7 }, modes: [ { type: 'fall', base: 0.55, osc: 0.0, sp: 0.04, ph: 0 }, { type: 'turbulent', base: 0.45, osc: 0.6, sp: 0.2, ph: r(0, 6) } ] };
+      // structure / engineering / builders
+      if (s.includes('trust') || s.includes('engineering') || s.includes('builders'))
+        return { accentEvery: 8, seedBias: 'uniform', centers: [[0.5, 0.5]], modes: [ { type: 'woven', base: 0.9, osc: 0.12, sp: 0.04, ph: 0 } ] };
       if (s.includes('surprise'))
-        return { accentEvery: 8, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [
-          { type: 'rise',  base: 0.6, osc: 0.0,  sp: 0.04, ph: 0 },
-          { type: 'swirl', base: 0.4, osc: 0.4,  sp: 0.05, ph: r(0, 6) } ] };
-      if (s.includes('coda') || s.includes('rest of us') || s.includes('room') || s.includes('means'))
-        return { accentEvery: 9, seedBias: 'uniform', centers: [[0.5, 0.5]], modes: [
-          { type: 'horizon', base: 0.85, osc: 0.20, sp: 0.035, ph: r(0, 6) } ] };
-      // default: a seeded horizon + swirl that drifts
-      return { accentEvery: 8 + (rng() * 3 | 0), seedBias: 'uniform', centers: [[r(0.4, 0.6), r(0.4, 0.6)]], modes: [
-        { type: 'horizon', base: r(0.5, 0.75), osc: r(0.3, 0.5), sp: r(0.035, 0.06), ph: r(0, 6) },
-        { type: 'swirl',   base: r(0.25, 0.45), osc: r(0.3, 0.5), sp: r(0.04, 0.06), ph: r(0, 6) } ] };
+        return { accentEvery: 8, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [ { type: 'rise', base: 0.6, osc: 0, sp: 0.04, ph: 0 }, { type: 'swirl', base: 0.4, osc: 0.4, sp: 0.05, ph: r(0, 6) } ] };
+      // outward to others
+      if (s.includes('rest of us') || s.includes('means for'))
+        return { accentEvery: 8, seedBias: 'center', centers: [[0.5, 0.5]], modes: [ { type: 'radialOut', base: 0.85, osc: 0, sp: 0.04, ph: 0 }, { type: 'swirl', base: 0.18, osc: 0.2, sp: 0.05, ph: r(0, 6) } ] };
+      // the sylph path / hollow — faint, dispersing, empty
+      if (s.includes("don't build") || s.includes('dont build') || s.includes('what if we'))
+        return { accentEvery: 10, seedBias: 'center', density: 0.55, faint: true, centers: [[0.5, 0.5]], modes: [ { type: 'radialOut', base: 0.6, osc: 0, sp: 0.04, ph: 0 }, { type: 'swirl', base: 0.5, osc: 0.3, sp: 0.05, ph: r(0, 6) } ] };
+      // a floor / foundation
+      if (s.includes('philosophical floor') || s.includes('floor'))
+        return { accentEvery: 9, seedBias: 'uniform', centers: [[0.5, 0.5]], modes: [ { type: 'horizon', base: 0.9, osc: 0.1, sp: 0.03, ph: 0 } ] };
+      // coda / settling / footnotes (faint margin)
+      if (s.includes('coda') || s.includes('becoming more human'))
+        return { accentEvery: 9, seedBias: 'uniform', centers: [[0.5, 0.5]], modes: [ { type: 'settle', base: 0.9, osc: 0.15, sp: 0.03, ph: 0 } ] };
+      if (s.includes('footnote'))
+        return { accentEvery: 12, seedBias: 'uniform', density: 0.4, faint: true, centers: [[0.5, 0.5]], modes: [ { type: 'settle', base: 0.95, osc: 0.05, sp: 0.025, ph: 0 } ] };
+      return { accentEvery: 8 + (rng() * 3 | 0), seedBias: 'uniform', centers: [[r(0.4, 0.6), r(0.4, 0.6)]], modes: [ { type: 'horizon', base: r(0.5, 0.75), osc: r(0.3, 0.5), sp: r(0.035, 0.06), ph: r(0, 6) }, { type: 'swirl', base: r(0.25, 0.45), osc: r(0.3, 0.5), sp: r(0.04, 0.06), ph: r(0, 6) } ] };
     }
-
     function seedPos(rng, bias) {
       if (bias === 'forkbase') return [0.40 + rng() * 0.20, 0.60 + rng() * 0.38];
-      if (bias === 'lower')    return [0.07 + rng() * 0.86, 0.42 + rng() * 0.56];
+      if (bias === 'lower') return [0.07 + rng() * 0.86, 0.42 + rng() * 0.56];
+      if (bias === 'upper') return [0.06 + rng() * 0.88, 0.02 + rng() * 0.42];
+      if (bias === 'center') return [0.5 + (rng() - 0.5) * 0.28, 0.5 + (rng() - 0.5) * 0.28];
       return [0.05 + rng() * 0.90, 0.06 + rng() * 0.88];
     }
 
@@ -164,79 +137,67 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
       const seed = canvas.dataset.seed || 'a';
       const rng = mulberry32(hashStr(seed) ^ 0x9e3779b9);
       const rec = recipeFor(seed, canvas.dataset.recipe);
-
-      let nSeeds = variant === 'hero' ? 96 : variant === 'card' ? 74 : 46;
-      let steps = variant === 'hero' ? 84 : variant === 'card' ? 70 : 52;
-      if (small) { nSeeds = Math.round(nSeeds * 0.62); steps = Math.round(steps * 0.85); }
-      const h = 0.012;
-
-      const seeds = [];
-      for (let i = 0; i < nSeeds; i++) {
-        const isAccent = (i % rec.accentEvery) === (rng() * rec.accentEvery | 0);
-        const ci = isAccent ? 2 : (i % 5 === 0 ? 1 : 0);
-        const p = seedPos(rng, rec.seedBias);
-        seeds.push({ x: p[0], y: p[1], ci, shift: isAccent && rng() < 0.5,
-          a0: (variant === 'header' ? 0.26 : 0.17) + rng() * (variant === 'header' ? 0.22 : 0.20),
-          am: 0.06 + rng() * 0.10, asp: 0.08 + rng() * 0.18, aph: rng() * TAU,
-          csp: 0.04 + rng() * 0.04, w: 0.7 + rng() * 0.45 });
-      }
-
-      const d = { canvas, ctx: canvas.getContext('2d'), rec, seeds, steps, h, w: 0, hpx: 0, vis: true };
-      const resize = () => {
-        const r = canvas.getBoundingClientRect();
-        d.w = Math.max(1, r.width); d.hpx = Math.max(1, r.height);
-        canvas.width = Math.round(d.w * dpr); canvas.height = Math.round(d.hpx * dpr);
-        d.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      let P = (variant === 'hero' ? 130 : variant === 'card' ? 94 : 72) * (rec.density || 1);
+      let L = variant === 'hero' ? 26 : variant === 'card' ? 22 : 18;
+      if (small) P = Math.round(P * 0.6);
+      P = Math.round(P);
+      const speed = 0.0058;
+      const faint = rec.faint ? 0.6 : 1;
+      const parts = [];
+      const spawn = (p) => {
+        const q = seedPos(rng, rec.seedBias);
+        p.x = q[0]; p.y = q[1]; p.tr = [q[0], q[1]]; p.life = 50 + (rng() * 120 | 0);
       };
-      resize();
-      window.addEventListener('resize', resize, { passive: true });
-      if ('IntersectionObserver' in window)
-        new IntersectionObserver((es) => { d.vis = es[0].isIntersecting; }, { rootMargin: '160px' }).observe(canvas);
+      for (let i = 0; i < P; i++) {
+        const isAccent = (i % rec.accentEvery) === (rng() * rec.accentEvery | 0);
+        const p = { ci: isAccent ? 2 : (i % 5 === 0 ? 1 : 0), shift: isAccent && rng() < 0.5,
+          a0: ((variant === 'header' ? 0.22 : 0.15) + rng() * (variant === 'header' ? 0.18 : 0.16)) * faint,
+          am: 0.05 + rng() * 0.08, asp: 0.08 + rng() * 0.18, aph: rng() * TAU, csp: 0.04 + rng() * 0.04,
+          w: 0.7 + rng() * 0.4, tr: [] };
+        spawn(p); p.life = (rng() * 170 | 0) + 10; parts.push(p);
+      }
+      const d = { canvas, ctx: canvas.getContext('2d'), rec, parts, L, speed, spawn, w: 0, hpx: 0, vis: true };
+      const resize = () => { const r = canvas.getBoundingClientRect(); d.w = Math.max(1, r.width); d.hpx = Math.max(1, r.height); canvas.width = Math.round(d.w * dpr); canvas.height = Math.round(d.hpx * dpr); d.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+      resize(); window.addEventListener('resize', resize, { passive: true });
+      if ('IntersectionObserver' in window) new IntersectionObserver((es) => { d.vis = es[0].isIntersecting; }, { rootMargin: '160px' }).observe(canvas);
       dances.push(d);
-      if (reduce) drawOne(d, 5.0);
+      if (reduce) { for (let k = 0; k < 60; k++) stepDraw(d, k * 0.05, true); stepDraw(d, 3, false); }
     }
 
-    function drawOne(d, t) {
-      const { ctx, w, hpx, rec, seeds, steps, h } = d;
-      ctx.clearRect(0, 0, w, hpx);
-      for (const sd of seeds) {
-        let baseA = sd.a0 + sd.am * Math.sin(t * sd.asp + sd.aph);
-        baseA = clamp(baseA, 0.03, 0.7);
-        let col;
-        if (sd.shift) { const m = 0.5 - 0.5 * Math.cos(t * sd.csp + sd.aph); col = mix(PAL[2], PAL[0], m); }
-        else col = PAL[sd.ci];
-        let x = sd.x, y = sd.y;
-        ctx.lineWidth = sd.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-        ctx.beginPath(); ctx.moveTo(x * w, y * hpx);
-        for (let i = 1; i < steps; i++) {
-          const v = field(x, y, t, rec); const m = Math.hypot(v[0], v[1]) || 1;
-          x += h * v[0] / m; y += h * v[1] / m;
-          if (x < -0.08 || x > 1.08 || y < -0.12 || y > 1.12) break;
-          ctx.lineTo(x * w, y * hpx);
-        }
-        ctx.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${baseA.toFixed(3)})`;
-        ctx.stroke();
+    function stepDraw(d, t, advanceOnly) {
+      const { ctx, w, hpx, rec, parts, L, speed, spawn } = d;
+      const g = rec.pulse ? (1 - rec.pulse.depth * 0.5 * (1 + Math.sin(t * rec.pulse.sp))) : 1;
+      if (!advanceOnly) ctx.clearRect(0, 0, w, hpx);
+      for (const p of parts) {
+        const v = fieldDir(p.x, p.y, t, rec);
+        p.x += speed * v[0]; p.y += speed * v[1]; p.life--;
+        const off = p.x < -0.06 || p.x > 1.06 || p.y < -0.12 || p.y > 1.12;
+        if (p.life <= 0 || off) { spawn(p); continue; }
+        p.tr.push(p.x, p.y);
+        if (p.tr.length > L * 2) { p.tr.splice(0, 2); }
+        if (advanceOnly || p.tr.length < 4) continue;
+        let a = (p.a0 + p.am * Math.sin(t * p.asp + p.aph)) * g;
+        a = clamp(a, 0.02, 0.66);
+        let col = p.shift ? mix(PAL[2], PAL[0], 0.5 - 0.5 * Math.cos(t * p.csp + p.aph)) : PAL[p.ci];
+        ctx.beginPath(); ctx.moveTo(p.tr[0] * w, p.tr[1] * hpx);
+        for (let i = 2; i < p.tr.length; i += 2) ctx.lineTo(p.tr[i] * w, p.tr[i + 1] * hpx);
+        ctx.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${a.toFixed(3)})`;
+        ctx.lineWidth = p.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
       }
     }
 
     let start = null, last = 0;
-    function loop(ts) {
-      if (start === null) start = ts;
-      if (ts - last >= 33) { last = ts; const t = (ts - start) / 1000; for (const d of dances) if (d.vis) drawOne(d, t); }
-      requestAnimationFrame(loop);
-    }
+    function loop(ts) { if (start === null) start = ts; if (ts - last >= 33) { last = ts; const t = (ts - start) / 1000; for (const d of dances) if (d.vis) stepDraw(d, t, false); } requestAnimationFrame(loop); }
     function init() {
       document.querySelectorAll('canvas[data-dance]').forEach(build);
       const body = document.querySelector('.essay-body');
       if (body) body.querySelectorAll('h2').forEach((hd) => {
-        const c = document.createElement('canvas');
-        c.className = 'drawing-dance dance-header'; c.setAttribute('data-dance', ''); c.setAttribute('aria-hidden', 'true');
+        const c = document.createElement('canvas'); c.className = 'drawing-dance dance-header'; c.setAttribute('data-dance', ''); c.setAttribute('aria-hidden', 'true');
         c.dataset.variant = 'header'; c.dataset.seed = (hd.textContent || 'section').slice(0, 80);
         hd.insertAdjacentElement('afterend', c); build(c);
       });
       if (!reduce) requestAnimationFrame(loop);
     }
-    if (document.readyState !== 'loading') init();
-    else document.addEventListener('DOMContentLoaded', init);
+    if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
   })();
 </script>
