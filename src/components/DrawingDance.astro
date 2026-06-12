@@ -1,33 +1,38 @@
 ---
 /**
- * DrawingDance — a generative, animated line drawing in Alicia's "strata" hand:
- * layered horizontal contour lines (a horizon repeated — sediment, breath),
- * with organic harmonic wobble, amplitude growing toward the bottom, mostly ink
- * with an occasional accent line, and per-line transparency that slowly breathes.
- * Drawn on the page background using the page's own font colours. Seeded by
- * `seed` (title or header text) so each is distinct and reflects the words above.
- * variant: "hero" | "card" | "header".
+ * DrawingDance — "Alicia's ink": a generative flow-field of streamlines on the
+ * page background, drawn in the page's own font colours with breathing
+ * transparency. The underlying vector field is a blend of named motifs
+ * (horizon, swirl, rise, braid, wave, radial) whose weights slowly oscillate,
+ * so the whole drawing morphs from one shape to another — a slow, living dance.
+ *
+ * A per-title "recipe" chooses the motifs and choreography so the dance reflects
+ * the concept of the words above it. Pass `recipe` explicitly, or let it be
+ * derived from `seed` (the title / header text).
+ *
+ * variant: "hero" | "card" | "header"
  */
-const { seed = 'alicia', variant = 'header' } = Astro.props;
+const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
 ---
 <canvas
   class={`drawing-dance dance-${variant}`}
   data-dance
   data-seed={seed}
   data-variant={variant}
+  data-recipe={recipe}
   aria-hidden="true"
 ></canvas>
 
 <style is:global>
   .drawing-dance { display: block; width: 100%; pointer-events: none; }
-  .dance-card   { height: 150px; margin-top: 1.25rem; }
-  .dance-hero   { height: 210px; margin: 1.75rem 0 0.5rem; }
-  .dance-header { height: 78px; margin: 0.2rem 0 0.5rem; }
+  .dance-card   { height: 190px; margin-top: 1.25rem; }
+  .dance-hero   { height: 300px; margin: 1.75rem 0 0.5rem; }
+  .dance-header { height: 104px; margin: 0.2rem 0 0.6rem; }
   .dance-link   { display: block; }
   @media (max-width: 480px) {
-    .dance-card { height: 118px; }
-    .dance-hero { height: 158px; }
-    .dance-header { height: 60px; }
+    .dance-card { height: 150px; }
+    .dance-hero { height: 220px; }
+    .dance-header { height: 80px; }
   }
 </style>
 
@@ -36,6 +41,7 @@ const { seed = 'alicia', variant = 'header' } = Astro.props;
     if (window.__danceInit) return;
     window.__danceInit = true;
 
+    // ── helpers ──────────────────────────────────────────────────────────
     const mulberry32 = (a) => () => {
       a |= 0; a = (a + 0x6d2b79f5) | 0;
       let t = Math.imul(a ^ (a >>> 15), 1 | a);
@@ -56,95 +62,171 @@ const { seed = 'alicia', variant = 'header' } = Astro.props;
     const lerp = (a, b, t) => a + (b - a) * t;
     const mix = (c1, c2, t) => [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c1[2], c2[2], t)];
     const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
+    const TAU = 6.28318530718;
 
     const css = getComputedStyle(document.documentElement);
-    // PAL: [ink (primary line), ink-soft (quiet mid line), accent (rare highlight)]
     const PAL = [
-      css.getPropertyValue('--ink'),
-      css.getPropertyValue('--ink-soft'),
-      css.getPropertyValue('--accent'),
+      css.getPropertyValue('--ink'),      // 0 primary
+      css.getPropertyValue('--ink-soft'), // 1 quiet mid
+      css.getPropertyValue('--accent'),   // 2 rare highlight
     ].map(hex2rgb);
 
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const small = matchMedia('(max-width: 480px)').matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const dances = [];
 
+    // ── the field: a blend of named motifs ──────────────────────────────
+    function modeDir(type, x, y, t, ph, centers) {
+      let dx, dy;
+      switch (type) {
+        case 'horizon':
+          dx = 1; dy = 0.30 * Math.sin(TAU * 1.4 * y + 0.30 * t + ph) + 0.12 * Math.sin(TAU * 0.6 * x - 0.20 * t); break;
+        case 'wave':
+          dx = 1; dy = 0.7 * Math.sin(TAU * 1.05 * x + 0.42 * t + ph); break;
+        case 'rise':
+          dx = 0.30 * Math.sin(TAU * 1.0 * y + 0.25 * t + ph); dy = -1; break;
+        case 'swirl': {
+          const a = 1.7 * Math.sin(3.6 * y + 0.22 * t) + 1.5 * Math.cos(2.7 * x - 0.17 * t + ph) + 0.7 * Math.sin(2.1 * (x + y) + 0.10 * t);
+          dx = Math.cos(a); dy = Math.sin(a); break;
+        }
+        case 'radial':
+        case 'braid': {
+          dx = 0; dy = 0;
+          for (let i = 0; i < centers.length; i++) {
+            const c = centers[i], sgn = (type === 'braid' && (i & 1)) ? -1 : 1;
+            const rx = x - c[0], ry = y - c[1], r2 = rx * rx + ry * ry + 0.02;
+            dx += sgn * (-ry) / r2; dy += sgn * (rx) / r2;
+          }
+          break;
+        }
+        default: dx = 1; dy = 0;
+      }
+      const m = Math.hypot(dx, dy) || 1;
+      return [dx / m, dy / m];
+    }
+    function field(x, y, t, rec) {
+      let vx = 0, vy = 0;
+      for (const md of rec.modes) {
+        const w = Math.max(0, md.base + md.osc * 0.5 * (1 + Math.sin(t * md.sp + md.ph)));
+        if (w <= 0.001) continue;
+        const d = modeDir(md.type, x, y, t, md.ph, rec.centers);
+        vx += w * d[0]; vy += w * d[1];
+      }
+      return [vx, vy];
+    }
+
+    // ── recipes: choreography per concept (the "prompt") ────────────────
+    function recipeFor(seed, explicit) {
+      const rng = mulberry32(hashStr(seed));
+      const s = (explicit || seed || '').toLowerCase();
+      const r = (a, b) => a + (b - a) * rng();
+      // Emergence vs. Emergency: ordered horizon that periodically breaks into
+      // a rising swirl — control giving way to emergence.
+      if (s.includes('emergence') || s.includes('emergency')) {
+        return { accentEvery: 8, centers: [[0.5, 0.5]], modes: [
+          { type: 'horizon', base: 0.68, osc: 0.55, sp: 0.045, ph: 0 },
+          { type: 'swirl',   base: 0.22, osc: 0.6,  sp: 0.05,  ph: Math.PI },
+          { type: 'rise',    base: 0.10, osc: 0.18, sp: 0.07,  ph: 1.0 },
+        ] };
+      }
+      // The Humorphic Partnership: two centres whose streamlines braid together.
+      if (s.includes('humorphic') || s.includes('partnership')) {
+        return { accentEvery: 7, centers: [[0.36, 0.52], [0.64, 0.48]], modes: [
+          { type: 'braid', base: 0.75, osc: 0.35, sp: 0.04, ph: 0 },
+          { type: 'swirl', base: 0.30, osc: 0.35, sp: 0.05, ph: 2.0 },
+        ] };
+      }
+      // header motifs — light nudges so each section's dance has a temperament
+      if (s.includes('broke') || s.includes('silence') || s.includes('collapse'))
+        return { accentEvery: 9, centers: [[0.5, 0.5]], modes: [
+          { type: 'swirl', base: 0.6, osc: 0.5, sp: 0.06, ph: r(0, 6) },
+          { type: 'wave',  base: 0.3, osc: 0.4, sp: 0.05, ph: r(0, 6) } ] };
+      if (s.includes('coda') || s.includes('trust') || s.includes('room') || s.includes('rest of us'))
+        return { accentEvery: 9, centers: [[0.5, 0.5]], modes: [
+          { type: 'horizon', base: 0.8, osc: 0.3, sp: 0.04, ph: r(0, 6) },
+          { type: 'swirl',   base: 0.18, osc: 0.25, sp: 0.05, ph: r(0, 6) } ] };
+      if (s.includes('surprise') || s.includes('fork') || s.includes('emerg'))
+        return { accentEvery: 8, centers: [[0.5, 0.5]], modes: [
+          { type: 'horizon', base: 0.5, osc: 0.5, sp: 0.05, ph: r(0, 6) },
+          { type: 'rise',    base: 0.3, osc: 0.4, sp: 0.06, ph: r(0, 6) },
+          { type: 'swirl',   base: 0.3, osc: 0.4, sp: 0.05, ph: r(0, 6) } ] };
+      // default: a seeded blend of horizon + swirl that drifts
+      return { accentEvery: 8 + (rng() * 3 | 0), centers: [[r(0.4, 0.6), r(0.4, 0.6)]], modes: [
+        { type: 'horizon', base: r(0.5, 0.75), osc: r(0.3, 0.5), sp: r(0.035, 0.06), ph: r(0, 6) },
+        { type: 'swirl',   base: r(0.25, 0.45), osc: r(0.3, 0.5), sp: r(0.04, 0.06), ph: r(0, 6) },
+      ] };
+    }
+
     function build(canvas) {
       const variant = canvas.dataset.variant || 'header';
-      const rng = mulberry32(hashStr(canvas.dataset.seed || 'a'));
-      // Richness scales with the band's height (more strata in taller bands).
-      const count = variant === 'hero' ? 22 : variant === 'card' ? 16 : 9;
-      const accentEvery = 6 + ((rng() * 4) | 0);     // 6..9: one accent line now and then
-      const accentPhase = (rng() * count) | 0;
-      const layers = [];
-      for (let li = 0; li < count; li++) {
-        if (rng() < 0.06) continue;                  // bare paper between bands
-        const f = count > 1 ? li / (count - 1) : 0;  // 0 top → 1 bottom
-        const H = [];
-        for (let k = 1; k <= 3; k++) {
-          H.push({
-            kf: k * (0.6 + rng() * 0.9),             // spatial frequency (cycles across width)
-            ph: rng() * 6.283,
-            dr: (0.035 + rng() * 0.11) * (rng() < 0.5 ? -1 : 1), // slow phase drift
-            am: (1 / k) * (0.6 + rng() * 0.5),
-          });
-        }
-        const isAccent = ((li + accentPhase) % accentEvery) === 0;
-        const ci = isAccent ? 2 : (li % 4 === 0 ? 1 : 0); // accent / soft / ink (mostly ink)
-        layers.push({
-          yFrac: 0.10 + 0.80 * ((li + 0.5) / count),
-          amp: 0.010 + 0.035 * f,                    // amplitude grows toward the bottom
-          slope: (rng() * 2 - 1) * 0.018,
-          H,
+      const seed = canvas.dataset.seed || 'a';
+      const rng = mulberry32(hashStr(seed) ^ 0x9e3779b9);
+      const rec = recipeFor(seed, canvas.dataset.recipe);
+
+      let nSeeds = variant === 'hero' ? 92 : variant === 'card' ? 72 : 42;
+      let steps = variant === 'hero' ? 64 : variant === 'card' ? 56 : 38;
+      if (small) { nSeeds = Math.round(nSeeds * 0.62); steps = Math.round(steps * 0.85); }
+      const h = 0.013;
+
+      const seeds = [];
+      for (let i = 0; i < nSeeds; i++) {
+        const isAccent = (i % rec.accentEvery) === (rng() * rec.accentEvery | 0);
+        const ci = isAccent ? 2 : (i % 5 === 0 ? 1 : 0);
+        seeds.push({
+          x: 0.04 + rng() * 0.92,
+          y: 0.06 + rng() * 0.88,
           ci,
-          shift: isAccent && rng() < 0.55,           // a few accent lines slowly drift ink↔accent
-          a0: 0.40 + rng() * 0.34,                   // base transparency
-          am2: 0.08 + rng() * 0.13,                  // breathing amplitude
-          aSp: 0.09 + rng() * 0.20,                  // breathing speed (slow)
-          aPh: rng() * 6.283,
-          cSp: 0.04 + rng() * 0.04,
-          w: (variant === 'header' ? 0.9 : 1.15) + rng() * 0.5,
+          shift: isAccent && rng() < 0.5,
+          a0: (variant === 'header' ? 0.26 : 0.16) + rng() * (variant === 'header' ? 0.22 : 0.20),
+          am: 0.06 + rng() * 0.10,
+          asp: 0.08 + rng() * 0.18,
+          aph: rng() * TAU,
+          csp: 0.04 + rng() * 0.04,
+          w: 0.7 + rng() * 0.45,
         });
       }
-      const d = { canvas, ctx: canvas.getContext('2d'), layers, w: 0, h: 0, vis: true };
+
+      const d = { canvas, ctx: canvas.getContext('2d'), rec, seeds, steps, h, w: 0, hpx: 0, vis: true };
       const resize = () => {
         const r = canvas.getBoundingClientRect();
-        d.w = Math.max(1, r.width); d.h = Math.max(1, r.height);
-        canvas.width = Math.round(d.w * dpr); canvas.height = Math.round(d.h * dpr);
+        d.w = Math.max(1, r.width); d.hpx = Math.max(1, r.height);
+        canvas.width = Math.round(d.w * dpr); canvas.height = Math.round(d.hpx * dpr);
         d.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       };
       resize();
       window.addEventListener('resize', resize, { passive: true });
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver((es) => { d.vis = es[0].isIntersecting; }, { rootMargin: '140px' }).observe(canvas);
-      }
+      if ('IntersectionObserver' in window)
+        new IntersectionObserver((es) => { d.vis = es[0].isIntersecting; }, { rootMargin: '160px' }).observe(canvas);
       dances.push(d);
-      if (reduce) drawOne(d, 6.0);
+      if (reduce) drawOne(d, 5.0);
     }
 
     function drawOne(d, t) {
-      const { ctx, w, h, layers } = d;
-      ctx.clearRect(0, 0, w, h);
-      const steps = Math.max(22, Math.floor(w / 10));
-      for (const L of layers) {
-        let a = L.a0 + L.am2 * Math.sin(t * L.aSp + L.aPh);
-        a = clamp(a, 0.05, 0.88);
+      const { ctx, w, hpx, rec, seeds, steps, h } = d;
+      ctx.clearRect(0, 0, w, hpx);
+      for (const sd of seeds) {
+        let baseA = sd.a0 + sd.am * Math.sin(t * sd.asp + sd.aph);
+        baseA = clamp(baseA, 0.03, 0.7);
         let col;
-        if (L.shift) {
-          const m = 0.5 - 0.5 * Math.cos(t * L.cSp + L.aPh);
-          col = mix(PAL[2], PAL[0], m);
-        } else col = PAL[L.ci];
+        if (sd.shift) { const m = 0.5 - 0.5 * Math.cos(t * sd.csp + sd.aph); col = mix(PAL[2], PAL[0], m); }
+        else col = PAL[sd.ci];
+        const rs = `${col[0] | 0},${col[1] | 0},${col[2] | 0}`;
+        // integrate the streamline through the current field
+        let x = sd.x, y = sd.y;
+        ctx.lineWidth = sd.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         ctx.beginPath();
-        for (let i = 0; i <= steps; i++) {
-          const x = i / steps, px = x * w;
-          let wob = 0;
-          for (const hh of L.H) wob += hh.am * Math.sin(hh.kf * 6.283 * x + hh.ph + t * hh.dr);
-          wob /= L.H.length;
-          const y = (L.yFrac + L.amp * wob + L.slope * (x - 0.5)) * h;
-          if (i) ctx.lineTo(px, y); else ctx.moveTo(px, y);
+        let started = false;
+        for (let i = 0; i < steps; i++) {
+          const px = x * w, py = y * hpx;
+          if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
+          const v = field(x, y, t, rec);
+          const m = Math.hypot(v[0], v[1]) || 1;
+          x += h * v[0] / m; y += h * v[1] / m;
+          if (x < -0.08 || x > 1.08 || y < -0.08 || y > 1.08) break;
         }
-        ctx.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${a.toFixed(3)})`;
-        ctx.lineWidth = L.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        // fade the whole streamline a touch toward its faintest so the bundle reads as ink, not wire
+        ctx.strokeStyle = `rgba(${rs},${baseA.toFixed(3)})`;
         ctx.stroke();
       }
     }
@@ -152,7 +234,6 @@ const { seed = 'alicia', variant = 'header' } = Astro.props;
     let start = null, last = 0;
     function loop(ts) {
       if (start === null) start = ts;
-      // ~30fps is plenty for a slow horizon, and lighter on many bands.
       if (ts - last >= 33) {
         last = ts;
         const t = (ts - start) / 1000;
@@ -168,8 +249,7 @@ const { seed = 'alicia', variant = 'header' } = Astro.props;
         body.querySelectorAll('h2').forEach((hd) => {
           const c = document.createElement('canvas');
           c.className = 'drawing-dance dance-header';
-          c.setAttribute('data-dance', '');
-          c.setAttribute('aria-hidden', 'true');
+          c.setAttribute('data-dance', ''); c.setAttribute('aria-hidden', 'true');
           c.dataset.variant = 'header';
           c.dataset.seed = (hd.textContent || 'section').slice(0, 80);
           hd.insertAdjacentElement('afterend', c);
