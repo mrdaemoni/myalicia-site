@@ -1,0 +1,76 @@
+---
+// Renders a single essay (header + body) on its own standalone page.
+// `fm` is the markdown frontmatter; `Body` is the imported <Content /> component.
+const { fm, Body } = Astro.props;
+---
+<article id={fm.slug} class="essay-section">
+  <h1>{fm.title}</h1>
+  <header class="essay-header">
+    <p class="essay-dek"><em>{fm.dek}</em></p>
+    <p class="essay-meta">
+      <strong>{fm.author}</strong><br />
+      <em>
+        {fm.date}
+        {fm.relatedLinks && fm.relatedLinks.map((link: { label: string; url: string }) => (
+          <>{' · '}<a href={link.url}>{link.label}</a></>
+        ))}
+      </em>
+    </p>
+    {fm.paperUrl && (
+      <p class="essay-paper-link">
+        <a href={fm.paperUrl}>{fm.paperTitle}</a>
+      </p>
+    )}
+  </header>
+  <div class="essay-body">
+    <Body />
+  </div>
+</article>
+
+<style is:global>
+  .essay-section h1 { margin-bottom: 0.5rem; }
+  .essay-section .essay-header { margin: 0.5rem 0 2.5rem; }
+  .essay-section .essay-dek { font-size: 1.15rem; color: var(--ink-soft); margin: 0 0 0.75rem; }
+  .essay-section .essay-meta { font-size: 0.95rem; color: var(--ink-soft); margin: 0; }
+  .essay-section .essay-paper-link {
+    margin: 1rem 0 0;
+    padding: 0.6rem 0.9rem;
+    background: var(--bg-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.95rem;
+  }
+  .essay-section .essay-paper-link a { color: var(--ink); }
+  .essay-section .essay-paper-link a:hover { color: var(--accent); }
+  .essay-body h2 { font-size: 1.5rem; margin: 2.75rem 0 0.75rem; }
+  .essay-body h3 { font-size: 1.15rem; margin: 2rem 0 0.5rem; }
+  .essay-body blockquote {
+    border-left: 3px solid var(--accent);
+    margin: 1.5rem 0;
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .essay-body blockquote p:last-child { margin-bottom: 0; }
+  .essay-body hr { height: 1px; background: var(--rule); border: none; margin: 2.5rem 0; }
+  .essay-body ul, .essay-body ol { margin: 0 0 1.25rem; padding-left: 1.5rem; }
+  .essay-body li { margin-bottom: 0.35rem; }
+  .essay-body code {
+    background: var(--bg-soft);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    font-size: 0.92em;
+  }
+  .essay-body sup { font-size: 0.75em; }
+  .essay-body sup a { text-decoration: none; }
+  .essay-body .footnotes {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+  .essay-body .footnotes ol { padding-left: 1.25rem; }
+  .essay-body .footnotes li { margin-bottom: 0.5rem; }
+  .essay-back { font-size: 0.95rem; margin: 0 0 1.5rem; }
+</style>

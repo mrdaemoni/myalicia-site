@@ -1,150 +1,62 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { Content as EmergenceEmergency, frontmatter as ee } from '../../essays/emergence-vs-emergency.md';
-import { Content as HumorphicPartnership, frontmatter as hp } from '../../essays/the-humorphic-partnership.md';
+import { frontmatter as ee } from '../../essays/emergence-vs-emergency.md';
+import { frontmatter as hp } from '../../essays/the-humorphic-partnership.md';
 
-const essays = [
-  { fm: ee, Body: EmergenceEmergency },
-  { fm: hp, Body: HumorphicPartnership },
-];
+// Newest first.
+const essays = [ee, hp];
 ---
-<Base title="Essays · My Alicia">
+<Base
+  title="Essays · My Alicia"
+  description="Long-form pieces on design rationale, lived moments, and the philosophical lineage of My Alicia. Each one is signed and dated."
+>
   <h1>Essays</h1>
   <p class="lede">
     Long-form pieces on design rationale, lived moments, and the
     philosophical lineage of My Alicia. Each one is signed and dated.
   </p>
 
-  <nav class="page-toc" aria-label="Essays on this page">
-    {essays.map(({ fm }) => (
-      <a href={`#${fm.slug}`}>{fm.title}</a>
+  <ul class="essay-list">
+    {essays.map((fm) => (
+      <li class="essay-list-item">
+        <a class="essay-list-title" href={`/essays/${fm.slug}/`}>{fm.title}</a>
+        <p class="essay-list-dek">{fm.dek}</p>
+        <p class="essay-list-meta">{fm.date}</p>
+      </li>
     ))}
-  </nav>
-
-  {essays.map(({ fm, Body }) => (
-    <section id={fm.slug} class="essay-section">
-      <h2>{fm.title}</h2>
-      <header class="essay-header">
-        <p class="essay-dek"><em>{fm.dek}</em></p>
-        <p class="essay-meta">
-          <strong>{fm.author}</strong><br />
-          <em>
-            {fm.date}
-            {fm.relatedLinks && fm.relatedLinks.map((link: { label: string; url: string }) => (
-              <>{' · '}<a href={link.url}>{link.label}</a></>
-            ))}
-          </em>
-        </p>
-        {fm.paperUrl && (
-          <p class="essay-paper-link">
-            <a href={fm.paperUrl}>{fm.paperTitle}</a>
-          </p>
-        )}
-      </header>
-      <div class="essay-body">
-        <Body />
-      </div>
-      <p class="back-to-toc"><a href="#top">↑ Back to top</a></p>
-    </section>
-  ))}
+  </ul>
 </Base>
 
-<style is:global>
-  /* Essay rendering inside the long-page /essays layout. The .md file
-     supplies h2…h6, blockquotes, footnotes etc.; we just tighten the
-     visual rhythm here. */
-
-  /* Table of contents: one essay per line, scrolls to its section. */
-  .page-toc {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin: 1.75rem 0 3rem;
-    padding-left: 1rem;
-    border-left: 2px solid var(--rule);
+<style>
+  .essay-list {
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 0;
   }
-  .page-toc a {
-    width: fit-content;
-    font-size: 1.05rem;
+  .essay-list-item {
+    padding: 1.75rem 0;
+    border-top: 1px solid var(--rule);
+  }
+  .essay-list-item:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+  .essay-list-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--ink);
     text-decoration: none;
-    color: var(--accent);
   }
-  .page-toc a:hover {
-    text-decoration: underline;
-  }
-  html { scroll-behavior: smooth; }
-  .essay-section { scroll-margin-top: 1.5rem; }
-
-  .essay-section .essay-header {
-    margin: 0.5rem 0 2.5rem;
-  }
-  .essay-section .essay-dek {
-    font-size: 1.1rem;
+  .essay-list-title:hover { color: var(--accent); text-decoration: none; }
+  .essay-list-dek {
+    font-size: 1.05rem;
     color: var(--ink-soft);
-    margin: 0 0 0.75rem;
+    margin: 0.5rem 0 0.4rem;
   }
-  .essay-section .essay-meta {
-    font-size: 0.95rem;
+  .essay-list-meta {
+    font-size: 0.9rem;
     color: var(--ink-soft);
     margin: 0;
   }
-  .essay-section .essay-paper-link {
-    margin: 1rem 0 0;
-    padding: 0.6rem 0.9rem;
-    background: var(--bg-soft);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 6px 6px 0;
-    font-size: 0.95rem;
-  }
-  .essay-section .essay-paper-link a { color: var(--ink); }
-  .essay-section .essay-paper-link a:hover { color: var(--accent); }
-  .essay-section + .essay-section {
-    margin-top: 4rem;
-    padding-top: 3rem;
-    border-top: 1px solid var(--rule);
-  }
-  .essay-body h2 {
-    font-size: 1.5rem;
-    margin: 2.75rem 0 0.75rem;
-  }
-  .essay-body h3 {
-    font-size: 1.15rem;
-    margin: 2rem 0 0.5rem;
-  }
-  .essay-body blockquote {
-    border-left: 3px solid var(--accent);
-    margin: 1.5rem 0;
-    padding: 0.25rem 0 0.25rem 1.25rem;
-    color: var(--ink-soft);
-    font-style: italic;
-  }
-  .essay-body blockquote p:last-child { margin-bottom: 0; }
-  .essay-body hr {
-    height: 1px;
-    background: var(--rule);
-    border: none;
-    margin: 2.5rem 0;
-  }
-  .essay-body ul, .essay-body ol {
-    margin: 0 0 1.25rem;
-    padding-left: 1.5rem;
-  }
-  .essay-body li { margin-bottom: 0.35rem; }
-  .essay-body code {
-    background: var(--bg-soft);
-    padding: 0.1em 0.35em;
-    border-radius: 4px;
-    font-size: 0.92em;
-  }
-  .essay-body sup { font-size: 0.75em; }
-  .essay-body sup a { text-decoration: none; }
-  .essay-body .footnotes {
-    margin-top: 4rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--rule);
-    font-size: 0.92rem;
-    color: var(--ink-soft);
-  }
-  .essay-body .footnotes ol { padding-left: 1.25rem; }
-  .essay-body .footnotes li { margin-bottom: 0.5rem; }
 </style>
