@@ -54,7 +54,7 @@ If you make things, with a person, with a team, or increasingly with some intell
 
 ## Coda
 
-I have a twelve-year-old daughter, and there's no version of loving her that runs on control. The more she becomes her own person, the more she does things that were never in my picture of her, the more it would be a failure, not a success, if I could predict her. What I can do is build the conditions: a home she can read, rules we can argue and change, honesty when I get it wrong. Then I trust, and she becomes someone I could never have specified and would never want to.
+I have a 12-year-old daughter, and there's no version of loving her that runs on control. The more she becomes her own person, the more she does things that were never in my picture of her, the more it would be a failure, not a success, if I could predict her. What I can do is build the conditions: a home she can read, rules we can argue and change, honesty when I get it wrong. Then I trust, and she becomes someone I could never have specified and would never want to.
 
 The moral stakes aren't the same. A system I build isn't a child, and I won't pretend otherwise. But the posture rhymes. Anything you want to keep becoming needs room to exceed your picture of it. You don't get to keep what you clamp down on. The grip that would make a thing safe is the same grip that would keep it from becoming anything at all.
 
