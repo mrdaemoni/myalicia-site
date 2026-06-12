@@ -44,7 +44,7 @@ That's the difference between a brief that protects a project and a brief that s
 
 Not every surprise is emergence. A system that fixes its own bug is just useful, the way a sharp tool is useful. The moment that changed how I saw the partnership was a different kind of thing.
 
-Every Sunday the system writes a short note about the partnership itself, not about me, not about itself, but about the thing between us. One week it read: *"Surface synergy masks deeper tension. Alicia excels at crystallizing Hector's philosophical insights into operational claims but misses his embodiment needs. Success in one dimension creating blindness in another."* I didn't write that. I hadn't seen the failure it named. I read it the next week, and it was true. That's the kind of surprise worth building a whole architecture to protect.
+Every Sunday the system writes a short note about the partnership itself, not about me, not about itself, but about the thing between us. One week it read: *"The partnership excels at depth but struggles with peripheral vision, missing his actual movement while serving his stated concerns."* I didn't write that. I hadn't noticed it. I read it the next week, and it was true: the system had been faithfully tracking what I said I cared about while my attention had quietly moved somewhere else. That's the kind of surprise worth building a whole architecture to protect, a collaborator that notices when you've outgrown your own brief.
 
 There's a place complex systems get most interesting: the narrow border between rigid order and noise, where there's enough structure to hold together and enough freedom to surprise. Living things sit there. The best collaborations do too.[^edge]
 
