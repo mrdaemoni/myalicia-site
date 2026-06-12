@@ -1,14 +1,14 @@
 ---
 /**
  * DrawingDance — "Alicia's ink": a generative flow-field of streamlines on the
- * page background, drawn in the page's own font colours with breathing
- * transparency. The underlying vector field is a blend of named motifs
- * (horizon, swirl, rise, braid, wave, radial) whose weights slowly oscillate,
- * so the whole drawing morphs from one shape to another — a slow, living dance.
+ * page background, in the page's own font colours with breathing transparency.
+ * The vector field is a blend of named motifs whose weights slowly oscillate,
+ * so the drawing morphs from one shape to another — a slow, living dance that
+ * answers the words above it.
  *
- * A per-title "recipe" chooses the motifs and choreography so the dance reflects
- * the concept of the words above it. Pass `recipe` explicitly, or let it be
- * derived from `seed` (the title / header text).
+ * Motifs: horizon, rise, turbulent, fork, braid, swirl, wave, radial.
+ * A per-title "recipe" picks motifs + choreography. Pass `recipe` explicitly or
+ * let it derive from `seed` (the title / header text).
  *
  * variant: "hero" | "card" | "header"
  */
@@ -16,23 +16,20 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
 ---
 <canvas
   class={`drawing-dance dance-${variant}`}
-  data-dance
-  data-seed={seed}
-  data-variant={variant}
-  data-recipe={recipe}
+  data-dance data-seed={seed} data-variant={variant} data-recipe={recipe}
   aria-hidden="true"
 ></canvas>
 
 <style is:global>
   .drawing-dance { display: block; width: 100%; pointer-events: none; }
-  .dance-card   { height: 190px; margin-top: 1.25rem; }
-  .dance-hero   { height: 300px; margin: 1.75rem 0 0.5rem; }
-  .dance-header { height: 104px; margin: 0.2rem 0 0.6rem; }
+  .dance-card   { height: 220px; margin-top: 1.25rem; }
+  .dance-hero   { height: 380px; margin: 1.5rem 0 0.5rem; }
+  .dance-header { height: 130px; margin: 0.2rem 0 0.6rem; }
   .dance-link   { display: block; }
   @media (max-width: 480px) {
-    .dance-card { height: 150px; }
-    .dance-hero { height: 220px; }
-    .dance-header { height: 80px; }
+    .dance-card { height: 170px; }
+    .dance-hero { height: 280px; }
+    .dance-header { height: 104px; }
   }
 </style>
 
@@ -41,121 +38,125 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
     if (window.__danceInit) return;
     window.__danceInit = true;
 
-    // ── helpers ──────────────────────────────────────────────────────────
     const mulberry32 = (a) => () => {
       a |= 0; a = (a + 0x6d2b79f5) | 0;
       let t = Math.imul(a ^ (a >>> 15), 1 | a);
       t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
-    const hashStr = (s) => {
-      let h = 2166136261 >>> 0;
-      for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
-      return h >>> 0;
-    };
-    const hex2rgb = (h) => {
-      h = (h || '').replace('#', '').trim();
-      if (h.length === 3) h = h.split('').map((c) => c + c).join('');
-      const n = parseInt(h || '333333', 16);
-      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-    };
+    const hashStr = (s) => { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+    const hex2rgb = (h) => { h = (h || '').replace('#', '').trim(); if (h.length === 3) h = h.split('').map((c) => c + c).join(''); const n = parseInt(h || '333333', 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
     const lerp = (a, b, t) => a + (b - a) * t;
     const mix = (c1, c2, t) => [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c1[2], c2[2], t)];
     const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
+    const smooth = (a, b, x) => { let t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
     const TAU = 6.28318530718;
 
     const css = getComputedStyle(document.documentElement);
-    const PAL = [
-      css.getPropertyValue('--ink'),      // 0 primary
-      css.getPropertyValue('--ink-soft'), // 1 quiet mid
-      css.getPropertyValue('--accent'),   // 2 rare highlight
-    ].map(hex2rgb);
-
+    const PAL = [css.getPropertyValue('--ink'), css.getPropertyValue('--ink-soft'), css.getPropertyValue('--accent')].map(hex2rgb);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const small = matchMedia('(max-width: 480px)').matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const dances = [];
 
-    // ── the field: a blend of named motifs ──────────────────────────────
-    function modeDir(type, x, y, t, ph, centers) {
+    // ── motifs (y: 0 = top, 1 = bottom; dy < 0 = upward / "coming up") ──
+    function modeDir(type, x, y, t, ph) {
       let dx, dy;
       switch (type) {
         case 'horizon':
-          dx = 1; dy = 0.30 * Math.sin(TAU * 1.4 * y + 0.30 * t + ph) + 0.12 * Math.sin(TAU * 0.6 * x - 0.20 * t); break;
+          dx = 1; dy = 0.28 * Math.sin(TAU * 1.4 * y + 0.30 * t + ph) + 0.10 * Math.sin(TAU * 0.6 * x - 0.20 * t); break;
         case 'wave':
           dx = 1; dy = 0.7 * Math.sin(TAU * 1.05 * x + 0.42 * t + ph); break;
-        case 'rise':
-          dx = 0.30 * Math.sin(TAU * 1.0 * y + 0.25 * t + ph); dy = -1; break;
+        case 'rise': // smooth, safe, coming up
+          dx = 0.13 * Math.sin(TAU * 0.8 * y + 0.18 * t + ph); dy = -1; break;
+        case 'turbulent': { // erratic, stressful churn — very high spatial frequency so streamlines jag and tremble
+          const a = 3.0 * Math.sin(22.0 * y + 2.6 * t + ph) + 2.6 * Math.cos(20.0 * x - 1.9 * t) + 2.1 * Math.sin(33.0 * (x + 0.6 * y) + 1.6 * t) + 1.4 * Math.sin(50.0 * x - 14.0 * y + 0.9 * t);
+          dx = Math.cos(a); dy = Math.sin(a); break;
+        }
         case 'swirl': {
           const a = 1.7 * Math.sin(3.6 * y + 0.22 * t) + 1.5 * Math.cos(2.7 * x - 0.17 * t + ph) + 0.7 * Math.sin(2.1 * (x + y) + 0.10 * t);
           dx = Math.cos(a); dy = Math.sin(a); break;
         }
-        case 'radial':
-        case 'braid': {
-          dx = 0; dy = 0;
-          for (let i = 0; i < centers.length; i++) {
-            const c = centers[i], sgn = (type === 'braid' && (i & 1)) ? -1 : 1;
-            const rx = x - c[0], ry = y - c[1], r2 = rx * rx + ry * ry + 0.02;
-            dx += sgn * (-ry) / r2; dy += sgn * (rx) / r2;
-          }
-          break;
+        case 'fork': { // one stream comes in and separates into two
+          const splitY = 0.52;
+          const sgn = (x >= 0.5) ? 1 : -1;
+          const upper = 1 - smooth(splitY - 0.10, splitY + 0.12, y); // 1 near top, 0 near bottom
+          const target = lerp(0.5, 0.5 + 0.26 * sgn, upper);
+          dx = (target - x) * 1.7 + 0.05 * Math.sin(TAU * y + 0.3 * t + ph);
+          dy = -1; break;
         }
         default: dx = 1; dy = 0;
       }
       const m = Math.hypot(dx, dy) || 1;
       return [dx / m, dy / m];
     }
+    function vortexDir(x, y, centers, braid) {
+      let dx = 0, dy = 0;
+      for (let i = 0; i < centers.length; i++) {
+        const c = centers[i], sgn = (braid && (i & 1)) ? -1 : 1;
+        const rx = x - c[0], ry = y - c[1], r2 = rx * rx + ry * ry + 0.02;
+        dx += sgn * (-ry) / r2; dy += sgn * (rx) / r2;
+      }
+      const m = Math.hypot(dx, dy) || 1; return [dx / m, dy / m];
+    }
     function field(x, y, t, rec) {
       let vx = 0, vy = 0;
       for (const md of rec.modes) {
         const w = Math.max(0, md.base + md.osc * 0.5 * (1 + Math.sin(t * md.sp + md.ph)));
         if (w <= 0.001) continue;
-        const d = modeDir(md.type, x, y, t, md.ph, rec.centers);
+        const d = (md.type === 'braid' || md.type === 'radial')
+          ? vortexDir(x, y, rec.centers, md.type === 'braid')
+          : modeDir(md.type, x, y, t, md.ph);
         vx += w * d[0]; vy += w * d[1];
       }
       return [vx, vy];
     }
 
-    // ── recipes: choreography per concept (the "prompt") ────────────────
+    // ── recipes: the "prompt" — each answers the concept of its words ──
     function recipeFor(seed, explicit) {
       const rng = mulberry32(hashStr(seed));
       const s = (explicit || seed || '').toLowerCase();
       const r = (a, b) => a + (b - a) * rng();
-      // Emergence vs. Emergency: ordered horizon that periodically breaks into
-      // a rising swirl — control giving way to emergence.
-      if (s.includes('emergence') || s.includes('emergency')) {
-        return { accentEvery: 8, centers: [[0.5, 0.5]], modes: [
-          { type: 'horizon', base: 0.68, osc: 0.55, sp: 0.045, ph: 0 },
-          { type: 'swirl',   base: 0.22, osc: 0.6,  sp: 0.05,  ph: Math.PI },
-          { type: 'rise',    base: 0.10, osc: 0.18, sp: 0.07,  ph: 1.0 },
-        ] };
-      }
+      // Emergence vs. Emergency: comes up smooth & safe, then morphs erratic & stressful.
+      if (s.includes('emergence') || s.includes('emergency'))
+        return { accentEvery: 8, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [
+          { type: 'rise',      base: 0.85, osc: 0.0,  sp: 0.04, ph: 0 },
+          { type: 'turbulent', base: 0.05, osc: 1.7,  sp: 0.23, ph: 0 } ] };
+      // The fork: one stream comes in and separates into two.
+      if (s.includes('fork'))
+        return { accentEvery: 6, seedBias: 'forkbase', centers: [[0.5, 0.5]], modes: [
+          { type: 'fork', base: 1.0, osc: 0.0, sp: 0.05, ph: 0 } ] };
       // The Humorphic Partnership: two centres whose streamlines braid together.
-      if (s.includes('humorphic') || s.includes('partnership')) {
-        return { accentEvery: 7, centers: [[0.36, 0.52], [0.64, 0.48]], modes: [
-          { type: 'braid', base: 0.75, osc: 0.35, sp: 0.04, ph: 0 },
-          { type: 'swirl', base: 0.30, osc: 0.35, sp: 0.05, ph: 2.0 },
-        ] };
-      }
-      // header motifs — light nudges so each section's dance has a temperament
-      if (s.includes('broke') || s.includes('silence') || s.includes('collapse'))
-        return { accentEvery: 9, centers: [[0.5, 0.5]], modes: [
-          { type: 'swirl', base: 0.6, osc: 0.5, sp: 0.06, ph: r(0, 6) },
-          { type: 'wave',  base: 0.3, osc: 0.4, sp: 0.05, ph: r(0, 6) } ] };
-      if (s.includes('coda') || s.includes('trust') || s.includes('room') || s.includes('rest of us'))
-        return { accentEvery: 9, centers: [[0.5, 0.5]], modes: [
-          { type: 'horizon', base: 0.8, osc: 0.3, sp: 0.04, ph: r(0, 6) },
-          { type: 'swirl',   base: 0.18, osc: 0.25, sp: 0.05, ph: r(0, 6) } ] };
-      if (s.includes('surprise') || s.includes('fork') || s.includes('emerg'))
-        return { accentEvery: 8, centers: [[0.5, 0.5]], modes: [
-          { type: 'horizon', base: 0.5, osc: 0.5, sp: 0.05, ph: r(0, 6) },
-          { type: 'rise',    base: 0.3, osc: 0.4, sp: 0.06, ph: r(0, 6) },
-          { type: 'swirl',   base: 0.3, osc: 0.4, sp: 0.05, ph: r(0, 6) } ] };
-      // default: a seeded blend of horizon + swirl that drifts
-      return { accentEvery: 8 + (rng() * 3 | 0), centers: [[r(0.4, 0.6), r(0.4, 0.6)]], modes: [
+      if (s.includes('humorphic') || s.includes('partnership'))
+        return { accentEvery: 7, seedBias: 'uniform', centers: [[0.36, 0.52], [0.64, 0.48]], modes: [
+          { type: 'braid', base: 0.75, osc: 0.30, sp: 0.04, ph: 0 },
+          { type: 'swirl', base: 0.28, osc: 0.30, sp: 0.05, ph: 2.0 } ] };
+      // section-header temperaments
+      if (s.includes('broke') || s.includes('silence') || s.includes('collapse') || s.includes('dark'))
+        return { accentEvery: 9, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [
+          { type: 'rise',      base: 0.55, osc: 0.0,  sp: 0.04, ph: 0 },
+          { type: 'turbulent', base: 0.45, osc: 0.6,  sp: 0.20, ph: r(0, 6) } ] };
+      if (s.includes('trust') || s.includes('engineering'))
+        return { accentEvery: 9, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [
+          { type: 'rise',    base: 0.85, osc: 0.0,  sp: 0.04, ph: 0 },
+          { type: 'horizon', base: 0.20, osc: 0.15, sp: 0.04, ph: r(0, 6) } ] };
+      if (s.includes('surprise'))
+        return { accentEvery: 8, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [
+          { type: 'rise',  base: 0.6, osc: 0.0,  sp: 0.04, ph: 0 },
+          { type: 'swirl', base: 0.4, osc: 0.4,  sp: 0.05, ph: r(0, 6) } ] };
+      if (s.includes('coda') || s.includes('rest of us') || s.includes('room') || s.includes('means'))
+        return { accentEvery: 9, seedBias: 'uniform', centers: [[0.5, 0.5]], modes: [
+          { type: 'horizon', base: 0.85, osc: 0.20, sp: 0.035, ph: r(0, 6) } ] };
+      // default: a seeded horizon + swirl that drifts
+      return { accentEvery: 8 + (rng() * 3 | 0), seedBias: 'uniform', centers: [[r(0.4, 0.6), r(0.4, 0.6)]], modes: [
         { type: 'horizon', base: r(0.5, 0.75), osc: r(0.3, 0.5), sp: r(0.035, 0.06), ph: r(0, 6) },
-        { type: 'swirl',   base: r(0.25, 0.45), osc: r(0.3, 0.5), sp: r(0.04, 0.06), ph: r(0, 6) },
-      ] };
+        { type: 'swirl',   base: r(0.25, 0.45), osc: r(0.3, 0.5), sp: r(0.04, 0.06), ph: r(0, 6) } ] };
+    }
+
+    function seedPos(rng, bias) {
+      if (bias === 'forkbase') return [0.40 + rng() * 0.20, 0.60 + rng() * 0.38];
+      if (bias === 'lower')    return [0.07 + rng() * 0.86, 0.42 + rng() * 0.56];
+      return [0.05 + rng() * 0.90, 0.06 + rng() * 0.88];
     }
 
     function build(canvas) {
@@ -164,27 +165,20 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
       const rng = mulberry32(hashStr(seed) ^ 0x9e3779b9);
       const rec = recipeFor(seed, canvas.dataset.recipe);
 
-      let nSeeds = variant === 'hero' ? 92 : variant === 'card' ? 72 : 42;
-      let steps = variant === 'hero' ? 64 : variant === 'card' ? 56 : 38;
+      let nSeeds = variant === 'hero' ? 96 : variant === 'card' ? 74 : 46;
+      let steps = variant === 'hero' ? 84 : variant === 'card' ? 70 : 52;
       if (small) { nSeeds = Math.round(nSeeds * 0.62); steps = Math.round(steps * 0.85); }
-      const h = 0.013;
+      const h = 0.012;
 
       const seeds = [];
       for (let i = 0; i < nSeeds; i++) {
         const isAccent = (i % rec.accentEvery) === (rng() * rec.accentEvery | 0);
         const ci = isAccent ? 2 : (i % 5 === 0 ? 1 : 0);
-        seeds.push({
-          x: 0.04 + rng() * 0.92,
-          y: 0.06 + rng() * 0.88,
-          ci,
-          shift: isAccent && rng() < 0.5,
-          a0: (variant === 'header' ? 0.26 : 0.16) + rng() * (variant === 'header' ? 0.22 : 0.20),
-          am: 0.06 + rng() * 0.10,
-          asp: 0.08 + rng() * 0.18,
-          aph: rng() * TAU,
-          csp: 0.04 + rng() * 0.04,
-          w: 0.7 + rng() * 0.45,
-        });
+        const p = seedPos(rng, rec.seedBias);
+        seeds.push({ x: p[0], y: p[1], ci, shift: isAccent && rng() < 0.5,
+          a0: (variant === 'header' ? 0.26 : 0.17) + rng() * (variant === 'header' ? 0.22 : 0.20),
+          am: 0.06 + rng() * 0.10, asp: 0.08 + rng() * 0.18, aph: rng() * TAU,
+          csp: 0.04 + rng() * 0.04, w: 0.7 + rng() * 0.45 });
       }
 
       const d = { canvas, ctx: canvas.getContext('2d'), rec, seeds, steps, h, w: 0, hpx: 0, vis: true };
@@ -211,22 +205,16 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
         let col;
         if (sd.shift) { const m = 0.5 - 0.5 * Math.cos(t * sd.csp + sd.aph); col = mix(PAL[2], PAL[0], m); }
         else col = PAL[sd.ci];
-        const rs = `${col[0] | 0},${col[1] | 0},${col[2] | 0}`;
-        // integrate the streamline through the current field
         let x = sd.x, y = sd.y;
         ctx.lineWidth = sd.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-        ctx.beginPath();
-        let started = false;
-        for (let i = 0; i < steps; i++) {
-          const px = x * w, py = y * hpx;
-          if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
-          const v = field(x, y, t, rec);
-          const m = Math.hypot(v[0], v[1]) || 1;
+        ctx.beginPath(); ctx.moveTo(x * w, y * hpx);
+        for (let i = 1; i < steps; i++) {
+          const v = field(x, y, t, rec); const m = Math.hypot(v[0], v[1]) || 1;
           x += h * v[0] / m; y += h * v[1] / m;
-          if (x < -0.08 || x > 1.08 || y < -0.08 || y > 1.08) break;
+          if (x < -0.08 || x > 1.08 || y < -0.12 || y > 1.12) break;
+          ctx.lineTo(x * w, y * hpx);
         }
-        // fade the whole streamline a touch toward its faintest so the bundle reads as ink, not wire
-        ctx.strokeStyle = `rgba(${rs},${baseA.toFixed(3)})`;
+        ctx.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${baseA.toFixed(3)})`;
         ctx.stroke();
       }
     }
@@ -234,31 +222,20 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
     let start = null, last = 0;
     function loop(ts) {
       if (start === null) start = ts;
-      if (ts - last >= 33) {
-        last = ts;
-        const t = (ts - start) / 1000;
-        for (const d of dances) if (d.vis) drawOne(d, t);
-      }
+      if (ts - last >= 33) { last = ts; const t = (ts - start) / 1000; for (const d of dances) if (d.vis) drawOne(d, t); }
       requestAnimationFrame(loop);
     }
-
     function init() {
       document.querySelectorAll('canvas[data-dance]').forEach(build);
       const body = document.querySelector('.essay-body');
-      if (body) {
-        body.querySelectorAll('h2').forEach((hd) => {
-          const c = document.createElement('canvas');
-          c.className = 'drawing-dance dance-header';
-          c.setAttribute('data-dance', ''); c.setAttribute('aria-hidden', 'true');
-          c.dataset.variant = 'header';
-          c.dataset.seed = (hd.textContent || 'section').slice(0, 80);
-          hd.insertAdjacentElement('afterend', c);
-          build(c);
-        });
-      }
+      if (body) body.querySelectorAll('h2').forEach((hd) => {
+        const c = document.createElement('canvas');
+        c.className = 'drawing-dance dance-header'; c.setAttribute('data-dance', ''); c.setAttribute('aria-hidden', 'true');
+        c.dataset.variant = 'header'; c.dataset.seed = (hd.textContent || 'section').slice(0, 80);
+        hd.insertAdjacentElement('afterend', c); build(c);
+      });
       if (!reduce) requestAnimationFrame(loop);
     }
-
     if (document.readyState !== 'loading') init();
     else document.addEventListener('DOMContentLoaded', init);
   })();
