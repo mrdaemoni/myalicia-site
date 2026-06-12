@@ -1,6 +1,7 @@
 ---
 // Renders a single essay (header + body) on its own standalone page.
 // `fm` is the markdown frontmatter; `Body` is the imported <Content /> component.
+import DrawingDance from './DrawingDance.astro';
 const { fm, Body } = Astro.props;
 ---
 <article id={fm.slug} class="essay-section">
@@ -22,6 +23,7 @@ const { fm, Body } = Astro.props;
       </p>
     )}
   </header>
+  <DrawingDance seed={fm.title} variant="hero" />
   <div class="essay-body">
     <Body />
   </div>

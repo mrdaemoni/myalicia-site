@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import DrawingDance from '../../components/DrawingDance.astro';
 import { frontmatter as ee } from '../../essays/emergence-vs-emergency.md';
 import { frontmatter as hp } from '../../essays/the-humorphic-partnership.md';
 
@@ -22,6 +23,9 @@ const essays = [ee, hp];
         <a class="essay-list-title" href={`/essays/${fm.slug}/`}>{fm.title}</a>
         <p class="essay-list-dek">{fm.dek}</p>
         <p class="essay-list-meta">{fm.date}</p>
+        <a class="dance-link" href={`/essays/${fm.slug}/`} aria-label={`Read ${fm.title}`} tabindex="-1">
+          <DrawingDance seed={fm.title} variant="card" />
+        </a>
       </li>
     ))}
   </ul>
