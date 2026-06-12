@@ -125,9 +125,10 @@ const { seed = 'alicia', variant = 'header', recipe = '' } = Astro.props;
       // a floor / foundation
       if (s.includes('philosophical floor') || s.includes('floor'))
         return { accentEvery: 9, seedBias: 'uniform', centers: [[0.5, 0.5]], modes: [ { type: 'horizon', base: 0.9, osc: 0.1, sp: 0.03, ph: 0 } ] };
-      // coda / becoming more human — organic human figures, gesture-sketched, leaning together
+      // coda / becoming more human — organic and alive: two living currents intertwining
+      // and rising together. Reads as human warmth without drawing literal human shapes.
       if (s.includes('coda') || s.includes('becoming more human'))
-        return { accentEvery: 7, figures: true, seedBias: 'lower', centers: [[0.5, 0.5]], modes: [ { type: 'rise', base: 1, osc: 0, sp: 0.04, ph: 0 } ] };
+        return { accentEvery: 6, organic: true, seedBias: 'lower', centers: [[0.40, 0.55], [0.60, 0.50]], modes: [ { type: 'braid', base: 0.5, osc: 0.32, sp: 0.05, ph: 0 }, { type: 'rise', base: 0.5, osc: 0, sp: 0.04, ph: 0 }, { type: 'swirl', base: 0.22, osc: 0.25, sp: 0.05, ph: 2 } ] };
       // footnotes — muted dots / sparks drifting in the margin
       if (s.includes('footnote'))
         return { accentEvery: 9, seedBias: 'uniform', density: 0.7, faint: true, dots: true, speed: 0.0022, centers: [[0.5, 0.5]], modes: [ { type: 'settle', base: 0.7, osc: 0.1, sp: 0.02, ph: 0 } ] };

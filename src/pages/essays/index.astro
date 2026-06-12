@@ -48,9 +48,11 @@ const essays = [ee, hp];
   /* Whole card is a link; the dance is a full-bleed background and the
      title/dek/date float on top, so the ink bleeds up around the words. */
   .essay-list-link {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* title floats at the centre of the drawing */
     position: relative;
-    min-height: 300px;
+    min-height: 320px;
     padding: 1.75rem 0;
     text-decoration: none;
     color: inherit;
