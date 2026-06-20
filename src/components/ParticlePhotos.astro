@@ -1,172 +1,29 @@
 ---
 /**
- * ParticlePhotos — extends "Alicia's ink" onto photographs.
- *
- * The same flowing line-trails that drift behind the titles also wash over each
- * photo: particles advect along a vector field and leave short ink strokes, in
- * the site's own palette. Over a photo the ink becomes contrast-aware (light
- * strokes on dark areas, dark on light) so it always reads, and the *field* is
- * chosen per photo so the lines follow what the image is about once they enter
- * it — streaming toward a doorway, climbing a stair, rising from the earth.
- * Lines cross the frame edges so the drawing comes in and out of the picture.
- *
- * Progressive, reduce-motion aware, paused off-screen; plain captioned photo if
- * JS never runs. Keyed by image filename or an explicit data-essence attribute.
+ * PhotoFigure — wraps each image in .essay-body in a <figure> and gives it a
+ * <figcaption> from its alt text. Clean, captioned photographs. No animation.
  */
 ---
 <style is:global>
-  .weather-figure { position: relative; margin: 2.5rem -0.5rem; line-height: 0; border-radius: 10px; overflow: hidden; background: var(--bg-soft); }
+  .essay-body img { max-width: 100%; height: auto; border-radius: 10px; }
+  .weather-figure { margin: 2.5rem -0.5rem; line-height: 0; }
   .weather-figure img { display: block; width: 100%; height: auto; border-radius: 10px; }
-  .weather-figure .weather-particles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
   .weather-figure figcaption { line-height: 1.5; font-size: 0.88rem; color: var(--ink-soft); margin: 0.7rem 0.25rem 0; padding: 0 0.25rem; }
   @media (max-width: 480px) { .weather-figure { margin: 1.75rem -0.25rem; } }
 </style>
 
 <script>
   (function () {
-    if (window.__weatherParticlesInit) return;
-    window.__weatherParticlesInit = true;
-
-    const TAU = Math.PI * 2;
-    const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
-    const lerp = (a, b, t) => a + (b - a) * t;
-    const mix = (c1, c2, t) => [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c1[2], c2[2], t)];
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const small = matchMedia('(max-width: 480px)').matches;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const fields = [];
-    const hashStr = (s) => { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
-    const mulberry32 = (a) => () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-    const hex2rgb = (h) => { h = (h || '').replace('#', '').trim(); if (h.length === 3) h = h.split('').map((c) => c + c).join(''); const n = parseInt(h || '333333', 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
-    const cssv = getComputedStyle(document.documentElement);
-    const PAL = [cssv.getPropertyValue('--ink'), cssv.getPropertyValue('--ink-soft'), cssv.getPropertyValue('--accent')].map(hex2rgb);
-    const LIGHT = [246, 244, 238]; // the cream the site draws its dark ink against — used to lift strokes over dark photo areas
-
-    // ── per-photo "essence" fields: the lines follow what the image is about ──
-    const RECIPES = {
-      'light-fills-the-room': { spawnEdges: true, kinds: [
-        { frac: 0.62, field: 'toward', target: [0.50, 0.60], spawn: 'edges', speed: 0.0060, life: [90, 200], reach: 0.04 },
-        { frac: 0.38, field: 'radiate', source: [0.45, 0.16], spawn: 'point', spawnR: 0.13, speed: 0.0058, life: [55, 130], bias: [0, 0.35] } ] },
-      'weather-on-a-wall': { kinds: [
-        { frac: 1, field: 'gradient', sign: -1, spawn: 'edges', speed: 0.0050, life: [120, 240] } ] },
-      'the-red-stair': { kinds: [
-        { frac: 0.58, field: 'toward', target: [0.46, 0.42], spawn: 'low', speed: 0.0058, life: [100, 210], reach: 0.04 },
-        { frac: 0.42, field: 'radiate', source: [0.46, 0.42], spawn: 'point', spawnR: 0.15, speed: 0.0054, life: [55, 130], bias: [0, 0.20] } ] },
-      'feet-on-raw-stone': { kinds: [
-        { frac: 1, field: 'settle', spawn: 'edges', speed: 0.0042, life: [130, 260] } ] },
-      'red-earth-unfinished': { kinds: [
-        { frac: 1, field: 'rise', spawn: 'low', speed: 0.0056, life: [120, 250], sway: 0.55 } ] },
-      'the-dark-pool': { kinds: [
-        { frac: 1, field: 'ripple', spawn: 'edges', speed: 0.0040, life: [150, 300] } ] },
-    };
-    function recipeFor(token) { token = (token || '').toLowerCase(); for (const key in RECIPES) if (token.indexOf(key) !== -1) return RECIPES[key]; return null; }
-
-    function makeSampler(img) {
-      const sw = 110, sh = Math.max(1, Math.round(sw * (img.naturalHeight / img.naturalWidth)));
-      const oc = document.createElement('canvas'); oc.width = sw; oc.height = sh;
-      const octx = oc.getContext('2d', { willReadFrequently: true });
-      try { octx.drawImage(img, 0, 0, sw, sh); return { sw, sh, data: octx.getImageData(0, 0, sw, sh).data }; } catch (e) { return null; }
-    }
-    function colourAt(s, nx, ny) { const x = clamp(nx * s.sw | 0, 0, s.sw - 1), y = clamp(ny * s.sh | 0, 0, s.sh - 1), i = (y * s.sw + x) * 4; return [s.data[i], s.data[i + 1], s.data[i + 2]]; }
-    function lumAt(s, nx, ny) { const c = colourAt(s, nx, ny); return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; }
-    function lumGrad(s, x, y) { const e = 0.05; return [lumAt(s, x + e, y) - lumAt(s, x - e, y), lumAt(s, x, y + e) - lumAt(s, x, y - e)]; }
-    function curl(x, y, t) {
-      const a = 1.6 * Math.sin(2.1 * y + 0.18 * t) + 1.2 * Math.cos(1.7 * x - 0.13 * t);
-      const b = 1.4 * Math.cos(2.4 * x + 0.15 * t) + 1.0 * Math.sin(1.9 * y - 0.11 * t);
-      const dx = Math.cos(a) + 0.4 * Math.cos(b); const dy = Math.sin(b) - 0.4 * Math.sin(a) - 0.25;
-      const m = Math.hypot(dx, dy) || 1; return [dx / m, dy / m];
-    }
-    function fieldVec(kind, p, t, s) {
-      let dx, dy;
-      switch (kind.field) {
-        case 'toward':  dx = kind.target[0] - p.x; dy = kind.target[1] - p.y; break;
-        case 'radiate': dx = p.x - kind.source[0]; dy = p.y - kind.source[1]; if (Math.hypot(dx, dy) < 0.02) { dx = Math.cos(p.aph); dy = Math.sin(p.aph); } break;
-        case 'rise':    dx = (kind.sway || 0.4) * Math.sin(p.y * 6 + t * 0.6 + p.aph); dy = -1; break;
-        case 'fall':    dx = (kind.sway || 0.3) * Math.sin(p.y * 6 + t * 0.6 + p.aph); dy = 1; break;
-        case 'settle':  dx = 0.5 * Math.sin(p.x * 4 + t * 0.4 + p.aph); dy = 0.7; break;
-        case 'ripple':  dx = 0.6 + 0.5 * Math.sin(t * 0.2 + p.aph); dy = 0.18 * Math.sin(p.x * 10 + t * 0.6 + p.aph); break;
-        case 'gradient': { const g = s ? lumGrad(s, p.x, p.y) : [0, 0]; dx = (kind.sign || -1) * g[0]; dy = (kind.sign || -1) * g[1]; if (Math.hypot(dx, dy) < 1e-3) { const c = curl(p.x * 3, p.y * 3, t); dx = c[0]; dy = c[1]; } break; }
-        default: { const c = curl(p.x * 3, p.y * 3, t); dx = c[0]; dy = c[1]; }
-      }
-      if (kind.bias) { dx += kind.bias[0]; dy += kind.bias[1]; }
-      const m = Math.hypot(dx, dy) || 1; return [dx / m, dy / m];
-    }
-    function spawnPos(kind, rng) {
-      switch (kind.spawn) {
-        case 'edges': { const s = rng() * 4 | 0, u = rng(); return s === 0 ? [u, -0.03] : s === 1 ? [u, 1.03] : s === 2 ? [-0.03, u] : [1.03, u]; }
-        case 'point': { const a = rng() * TAU, r = rng() * (kind.spawnR || 0.1); return [kind.source[0] + Math.cos(a) * r, kind.source[1] + Math.sin(a) * r]; }
-        case 'low': return [rng(), 0.80 + rng() * 0.23];
-        case 'area': { const b = kind.box; return [b[0] + rng() * (b[2] - b[0]), b[1] + rng() * (b[3] - b[1])]; }
-        default: return [rng(), rng()];
-      }
-    }
-
-    function enhance(img) {
-      if (img.dataset.weatherDone) return; img.dataset.weatherDone = '1';
-      const sampler = makeSampler(img);
-      const token = img.getAttribute('data-essence') || img.getAttribute('src') || img.getAttribute('alt') || '';
-      const recipe = recipeFor(token);
-
+    if (window.__photoFiguresInit) return; window.__photoFiguresInit = true;
+    function wrap(img) {
+      if (img.dataset.figDone) return; img.dataset.figDone = '1';
       const fig = document.createElement('figure'); fig.className = 'weather-figure';
       const parent = img.parentNode; parent.insertBefore(fig, img); fig.appendChild(img);
-      const canvas = document.createElement('canvas'); canvas.className = 'weather-particles'; canvas.setAttribute('aria-hidden', 'true'); fig.appendChild(canvas);
       const alt = img.getAttribute('alt');
       if (alt) { const cap = document.createElement('figcaption'); cap.textContent = alt; fig.appendChild(cap); }
       if (parent && parent.tagName === 'P' && !parent.textContent.trim() && parent.children.length === 0) parent.remove();
-
-      const ctx = canvas.getContext('2d');
-      const rng = mulberry32(hashStr(alt || token));
-      const L = small ? 16 : 24;
-      const f = { ctx, sampler, recipe, parts: [], w: 0, h: 0, vis: true, mouse: null, rng, L };
-
-      const kindFor = (i, P) => { if (!recipe) return null; const u = (i + 0.5) / P; let acc = 0; for (const k of recipe.kinds) { acc += k.frac; if (u <= acc) return k; } return recipe.kinds[recipe.kinds.length - 1]; };
-      const spawn = (p, fresh) => {
-        const k = p.kind;
-        if (k) { const q = spawnPos(k, rng); p.x = q[0]; p.y = q[1]; const lo = k.life[0], hi = k.life[1]; p.life = lo + (rng() * (hi - lo) | 0); }
-        else { p.x = rng(); p.y = rng(); p.life = 120 + (rng() * 160 | 0); }
-        p.tr = []; p.w = 0.7 + rng() * 0.5; p.a0 = 0.30 + rng() * 0.30; p.am = 0.05 + rng() * 0.08; p.asp = 0.06 + rng() * 0.05; p.aph = rng() * TAU;
-      };
-      const baseCount = clamp(Math.round((img.naturalWidth || 1200) / 18), 26, 84);
-      const P = small ? Math.round(baseCount * 0.6) : baseCount;
-      for (let i = 0; i < P; i++) { const p = { kind: kindFor(i, P), ci: (i % 7 === 0) ? 2 : (i % 3 === 0 ? 1 : 0) }; spawn(p, true); f.parts.push(p); }
-
-      const resize = () => { const r = canvas.getBoundingClientRect(); f.w = Math.max(1, r.width); f.h = Math.max(1, r.height); canvas.width = Math.round(f.w * dpr); canvas.height = Math.round(f.h * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
-      resize(); window.addEventListener('resize', resize, { passive: true });
-      if ('IntersectionObserver' in window) new IntersectionObserver((es) => { f.vis = es[0].isIntersecting; }, { rootMargin: '180px' }).observe(canvas);
-      fig.addEventListener('pointermove', (e) => { const r = canvas.getBoundingClientRect(); f.mouse = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; }, { passive: true });
-      fig.addEventListener('pointerleave', () => { f.mouse = null; });
-      fields.push(f);
-      if (reduce && sampler) { for (let s = 0; s < 70; s++) stepDraw(f, s * 0.05, true); stepDraw(f, 3.5, false); }
     }
-
-    function stepDraw(f, t, advanceOnly) {
-      const { ctx, w, h, sampler, parts, L } = f; if (!sampler) return;
-      if (!advanceOnly) ctx.clearRect(0, 0, w, h);
-      for (const p of parts) {
-        const k = p.kind; const speed = k ? k.speed : 0.0050;
-        const v = fieldVec(k || {}, p, t, sampler); let vx = v[0], vy = v[1];
-        if (f.mouse) { const mx = f.mouse[0] - p.x, my = f.mouse[1] - p.y, d2 = mx * mx + my * my; if (d2 < 0.09) { const g = (0.09 - d2) / 0.09; vx += mx * 5 * g; vy += my * 5 * g; } }
-        const m = Math.hypot(vx, vy) || 1; p.x += speed * vx / m; p.y += speed * vy / m; p.life--;
-        const reached = k && k.reach && k.field === 'toward' && Math.hypot(k.target[0] - p.x, k.target[1] - p.y) < k.reach;
-        if (p.life <= 0 || reached || p.x < -0.08 || p.x > 1.08 || p.y < -0.12 || p.y > 1.12) { spawn(p, false); continue; }
-        p.tr.push(p.x, p.y); if (p.tr.length > L * 2) p.tr.splice(0, 2);
-        if (advanceOnly || p.tr.length < 4) continue;
-        let a = p.a0 + p.am * Math.sin(t * p.asp + p.aph); if (f.mouse) a *= 1.2; a = clamp(a, 0.04, 0.7);
-        // contrast-aware ink: lift toward cream over dark areas so the site's line reads on any photo
-        const lum = lumAt(sampler, p.x, p.y);
-        let col = PAL[p.ci];
-        if (lum < 0.5) col = mix(col, LIGHT, clamp((0.5 - lum) / 0.5, 0, 1) * 0.92);
-        ctx.beginPath(); ctx.moveTo(p.tr[0] * w, p.tr[1] * h);
-        for (let i = 2; i < p.tr.length; i += 2) ctx.lineTo(p.tr[i] * w, p.tr[i + 1] * h);
-        ctx.strokeStyle = `rgba(${col[0] | 0},${col[1] | 0},${col[2] | 0},${a.toFixed(3)})`;
-        ctx.lineWidth = p.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
-      }
-    }
-
-    let start = null, last = 0;
-    function loop(ts) { if (start === null) start = ts; if (ts - last >= 33) { last = ts; const t = (ts - start) / 1000; for (const f of fields) if (f.vis) stepDraw(f, t, false); } requestAnimationFrame(loop); }
-    function ready(img, cb) { if (img.complete && img.naturalWidth) cb(); else img.addEventListener('load', cb, { once: true }); }
-    function init() { const imgs = document.querySelectorAll('.essay-body img'); if (!imgs.length) return; imgs.forEach((img) => ready(img, () => enhance(img))); if (!reduce) requestAnimationFrame(loop); }
+    function init() { document.querySelectorAll('.essay-body img').forEach(wrap); }
     if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
   })();
 </script>

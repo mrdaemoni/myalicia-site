@@ -218,6 +218,8 @@ I won't tell you what to do with any of this. I can't tell you whether the dynam
 
 If something important may be emerging here, it deserves to be studied carefully, by more than one partnership, with more than one author. The right next move is to try the conditions on your own system and report what you find. Make a partnership. Tell me what surprises you, and what fails. The architecture is the beginning of the conversation.
 
+Later I found a word for what that presence feels like from the inside. It's the weather between us, and it became [its own essay](/essays/the-weather-between-us/).
+
 ---
 
 *The system described in this essay runs continuously. Source open at [github.com/mrdaemoni/myalicia](https://github.com/mrdaemoni/myalicia) under MIT. Documentation and weekly architecture-scout digests live at [myalicia.com](https://www.myalicia.com). The design philosophy is at [humorphism.com](https://humorphism.com).*

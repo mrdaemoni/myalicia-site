@@ -62,6 +62,8 @@ The moral stakes aren't the same. A system I build isn't a child, and I won't pr
 
 The harness is thin. The exits are gated. Inside, there's room to become.
 
+What fills that room, once it's open, took another essay to name: [the weather between us](/essays/the-weather-between-us/).
+
 ---
 
 *Alicia has operated since January 2026, apart from the week it went dark. The system is open at [github.com/mrdaemoni/myalicia](https://github.com/mrdaemoni/myalicia) under MIT. The architecture behind this posture (the threat model, the patterns, the implementation, the evidence) is written up separately, in a companion paper for people who want to build it (forthcoming). The companion essay on what the partnership became is [The Humorphic Partnership](/essays/the-humorphic-partnership/). The design philosophy is at [humorphism.com](https://humorphism.com).*
