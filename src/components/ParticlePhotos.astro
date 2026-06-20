@@ -1,14 +1,14 @@
 ---
 /**
- * ParticlePhotos — extends "Alicia's ink" onto photographs.
+ * ParticlePhotos — extends "Alicia's ink" onto photographs, per image.
  *
- * Progressive enhancement: every <img> inside .essay-body is wrapped in a
- * figure, given a <figcaption> from its alt text, and overlaid with a canvas
- * of slow-drifting motes. Each mote samples the colour of the photo directly
- * beneath it, so the image seems to exhale points of its own light. Additive
- * compositing keeps it luminous; dark frames get quiet sparks, bright frames
- * shimmer. Respects prefers-reduced-motion, pauses when off-screen, and leaves
- * a perfectly good plain photo if JavaScript never runs.
+ * Every <img> in .essay-body is wrapped in a figure with a <figcaption> (from
+ * alt) and a canvas of slow motes that sample the colour of the photo beneath
+ * them. The *motion* is chosen per photo to express what the image is about —
+ * motes entering toward a doorway, light spilling from a glow, growth rising
+ * from the earth, stillness settling on water. Keyed by the image filename, or
+ * an explicit data-essence attribute. Progressive, reduce-motion aware, paused
+ * when off-screen; a plain captioned photo if JS never runs.
  */
 ---
 <style is:global>
@@ -20,30 +20,10 @@
     overflow: hidden;
     background: var(--bg-soft);
   }
-  .weather-figure img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-  }
-  .weather-figure .weather-particles {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .weather-figure figcaption {
-    line-height: 1.5;
-    font-size: 0.88rem;
-    color: var(--ink-soft);
-    margin: 0.7rem 0.25rem 0;
-    padding: 0 0.25rem;
-  }
-  @media (max-width: 480px) {
-    .weather-figure { margin: 1.75rem -0.25rem; }
-  }
+  .weather-figure img { display: block; width: 100%; height: auto; border-radius: 10px; }
+  .weather-figure .weather-particles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+  .weather-figure figcaption { line-height: 1.5; font-size: 0.88rem; color: var(--ink-soft); margin: 0.7rem 0.25rem 0; padding: 0 0.25rem; }
+  @media (max-width: 480px) { .weather-figure { margin: 1.75rem -0.25rem; } }
 </style>
 
 <script>
@@ -57,168 +37,154 @@
     const small = matchMedia('(max-width: 480px)').matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const fields = [];
-
-    // Tiny seeded RNG so a given image always dances the same way.
     const hashStr = (s) => { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
     const mulberry32 = (a) => () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 
-    // Build a small offscreen copy of the photo we can read colours from.
+    // ── per-photo "essence" recipes: motion that says what the image is about ──
+    const RECIPES = {
+      // Entry: most motes stream inward toward the doorway; the rest spill from the warm light above.
+      'light-fills-the-room': { kinds: [
+        { frac: 0.62, field: 'toward', target: [0.50, 0.60], spawn: 'edges', speed: 0.0026, life: [110, 230], reach: 0.05 },
+        { frac: 0.38, field: 'radiate', source: [0.45, 0.16], spawn: 'point', spawnR: 0.13, speed: 0.0026, life: [55, 140], bias: [0, 0.35], glow: 78 } ] },
+      // Atmosphere: motes drift down the brightness gradient, like light bleeding across the wall into shadow.
+      'weather-on-a-wall': { kinds: [
+        { frac: 1, field: 'gradient', sign: -1, spawn: 'uniform', speed: 0.0020, life: [150, 280] } ] },
+      // Transition: motes climb from below toward the window light; light also streams out of it.
+      'the-red-stair': { kinds: [
+        { frac: 0.58, field: 'toward', target: [0.46, 0.42], spawn: 'low', speed: 0.0026, life: [120, 240], reach: 0.05 },
+        { frac: 0.42, field: 'radiate', source: [0.46, 0.42], spawn: 'point', spawnR: 0.15, speed: 0.0024, life: [55, 140], bias: [0, 0.20], glow: 70 } ] },
+      // Grounding: slow motes settle downward onto the raw stone — standing, rooted, unhurried.
+      'feet-on-raw-stone': { kinds: [
+        { frac: 1, field: 'settle', spawn: 'uniform', speed: 0.0015, life: [170, 320] } ] },
+      // Growth: motes rise from the red earth and sway up the wall, like sap, like a thing still growing.
+      'red-earth-unfinished': { kinds: [
+        { frac: 1, field: 'rise', spawn: 'low', speed: 0.0024, life: [150, 300], sway: 0.55 } ] },
+      // Stillness: motes shimmer slowly across the dark water — depth, reflection, never tidy.
+      'the-dark-pool': { kinds: [
+        { frac: 1, field: 'ripple', spawn: 'area', box: [0.28, 0.50, 1.0, 0.96], speed: 0.0013, life: [200, 340] } ] },
+    };
+    function recipeFor(token) {
+      token = (token || '').toLowerCase();
+      for (const key in RECIPES) if (token.indexOf(key) !== -1) return RECIPES[key];
+      return null; // fall back to gentle curl
+    }
+
     function makeSampler(img) {
       const sw = 110, sh = Math.max(1, Math.round(sw * (img.naturalHeight / img.naturalWidth)));
-      const oc = document.createElement('canvas');
-      oc.width = sw; oc.height = sh;
+      const oc = document.createElement('canvas'); oc.width = sw; oc.height = sh;
       const octx = oc.getContext('2d', { willReadFrequently: true });
-      try {
-        octx.drawImage(img, 0, 0, sw, sh);
-        const data = octx.getImageData(0, 0, sw, sh).data;
-        return { sw, sh, data };
-      } catch (e) { return null; }
+      try { octx.drawImage(img, 0, 0, sw, sh); return { sw, sh, data: octx.getImageData(0, 0, sw, sh).data }; }
+      catch (e) { return null; }
     }
-
-    function sampleColour(s, nx, ny) {
-      const x = clamp((nx * s.sw) | 0, 0, s.sw - 1);
-      const y = clamp((ny * s.sh) | 0, 0, s.sh - 1);
-      const i = (y * s.sw + x) * 4;
+    function colourAt(s, nx, ny) {
+      const x = clamp(nx * s.sw | 0, 0, s.sw - 1), y = clamp(ny * s.sh | 0, 0, s.sh - 1), i = (y * s.sw + x) * 4;
       return [s.data[i], s.data[i + 1], s.data[i + 2]];
     }
-
+    function lumAt(s, nx, ny) { const c = colourAt(s, nx, ny); return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255; }
+    function lumGrad(s, x, y) { const e = 0.05; const gx = lumAt(s, x + e, y) - lumAt(s, x - e, y); const gy = lumAt(s, x, y + e) - lumAt(s, x, y - e); return [gx, gy]; }
     function curl(x, y, t) {
-      // Two layered sinusoids → a soft, slow, divergence-light drift.
       const a = 1.6 * Math.sin(2.1 * y + 0.18 * t) + 1.2 * Math.cos(1.7 * x - 0.13 * t);
       const b = 1.4 * Math.cos(2.4 * x + 0.15 * t) + 1.0 * Math.sin(1.9 * y - 0.11 * t);
-      const dx = Math.cos(a) + 0.4 * Math.cos(b);
-      const dy = Math.sin(b) - 0.4 * Math.sin(a) - 0.25; // gentle upward bias, like rising air
-      const m = Math.hypot(dx, dy) || 1;
-      return [dx / m, dy / m];
+      const dx = Math.cos(a) + 0.4 * Math.cos(b); const dy = Math.sin(b) - 0.4 * Math.sin(a) - 0.25;
+      const m = Math.hypot(dx, dy) || 1; return [dx / m, dy / m];
+    }
+
+    function fieldVec(kind, p, t, s) {
+      let dx, dy;
+      switch (kind.field) {
+        case 'toward':  dx = kind.target[0] - p.x; dy = kind.target[1] - p.y; break;
+        case 'radiate': dx = p.x - kind.source[0]; dy = p.y - kind.source[1]; if (Math.hypot(dx, dy) < 0.02) { dx = Math.cos(p.aph); dy = Math.sin(p.aph); } break;
+        case 'rise':    dx = (kind.sway || 0.4) * Math.sin(p.y * 6 + t * 0.6 + p.aph); dy = -1; break;
+        case 'fall':    dx = (kind.sway || 0.3) * Math.sin(p.y * 6 + t * 0.6 + p.aph); dy = 1; break;
+        case 'settle':  dx = 0.22 * Math.sin(p.x * 5 + t * 0.4 + p.aph); dy = 0.55; break;
+        case 'ripple':  dx = 0.4 + 0.5 * Math.sin(t * 0.2 + p.aph); dy = 0.2 * Math.sin(p.x * 10 + t * 0.6 + p.aph); break;
+        case 'gradient': { const g = s ? lumGrad(s, p.x, p.y) : [0, 0]; dx = (kind.sign || -1) * g[0]; dy = (kind.sign || -1) * g[1]; if (Math.hypot(dx, dy) < 1e-3) { const c = curl(p.x * 3, p.y * 3, t); dx = c[0] * 0.5; dy = c[1] * 0.5; } break; }
+        default: { const c = curl(p.x * 3, p.y * 3, t); dx = c[0]; dy = c[1]; }
+      }
+      if (kind.bias) { dx += kind.bias[0]; dy += kind.bias[1]; }
+      const m = Math.hypot(dx, dy) || 1; return [dx / m, dy / m];
+    }
+
+    function spawnPos(kind, rng) {
+      switch (kind.spawn) {
+        case 'edges': { const s = rng() * 4 | 0; const u = rng(); return s === 0 ? [u, -0.02] : s === 1 ? [u, 1.02] : s === 2 ? [-0.02, u] : [1.02, u]; }
+        case 'point': { const a = rng() * TAU, r = rng() * (kind.spawnR || 0.1); return [kind.source[0] + Math.cos(a) * r, kind.source[1] + Math.sin(a) * r]; }
+        case 'low': return [rng(), 0.72 + rng() * 0.28];
+        case 'area': { const b = kind.box; return [b[0] + rng() * (b[2] - b[0]), b[1] + rng() * (b[3] - b[1])]; }
+        default: return [rng(), rng()];
+      }
     }
 
     function enhance(img) {
-      if (img.dataset.weatherDone) return;
-      img.dataset.weatherDone = '1';
+      if (img.dataset.weatherDone) return; img.dataset.weatherDone = '1';
       const sampler = makeSampler(img);
+      const token = img.getAttribute('data-essence') || img.getAttribute('src') || img.getAttribute('alt') || '';
+      const recipe = recipeFor(token);
 
-      // Wrap: <figure><img><canvas><figcaption></figure>
-      const fig = document.createElement('figure');
-      fig.className = 'weather-figure';
-      const parent = img.parentNode;
-      parent.insertBefore(fig, img);
-      fig.appendChild(img);
-
-      const canvas = document.createElement('canvas');
-      canvas.className = 'weather-particles';
-      canvas.setAttribute('aria-hidden', 'true');
-      fig.appendChild(canvas);
-
+      const fig = document.createElement('figure'); fig.className = 'weather-figure';
+      const parent = img.parentNode; parent.insertBefore(fig, img); fig.appendChild(img);
+      const canvas = document.createElement('canvas'); canvas.className = 'weather-particles'; canvas.setAttribute('aria-hidden', 'true'); fig.appendChild(canvas);
       const alt = img.getAttribute('alt');
-      if (alt) {
-        const cap = document.createElement('figcaption');
-        cap.textContent = alt;
-        fig.appendChild(cap);
-      }
-      // If the original <img> sat alone in a <p>, drop the now-empty paragraph.
-      if (parent && parent.tagName === 'P' && !parent.textContent.trim() && parent.children.length === 0) {
-        parent.remove();
-      }
+      if (alt) { const cap = document.createElement('figcaption'); cap.textContent = alt; fig.appendChild(cap); }
+      if (parent && parent.tagName === 'P' && !parent.textContent.trim() && parent.children.length === 0) parent.remove();
 
       const ctx = canvas.getContext('2d');
-      const rng = mulberry32(hashStr(alt || img.src));
-      const f = { canvas, ctx, sampler, parts: [], w: 0, h: 0, vis: true, mouse: null };
+      const rng = mulberry32(hashStr(alt || token));
+      const f = { ctx, sampler, recipe, parts: [], w: 0, h: 0, vis: true, mouse: null, rng };
 
-      const spawn = (p, fresh) => {
-        p.x = rng(); p.y = fresh ? rng() : 1.05;
-        p.life = 140 + (rng() * 220 | 0);
-        p.size = (small ? 1.1 : 1.5) + rng() * (small ? 1.6 : 2.4);
-        p.a0 = 0.18 + rng() * 0.34;
-        p.aph = rng() * TAU;
-        p.asp = 0.5 + rng() * 1.3;
+      const kindFor = (i, P) => {
+        if (!recipe) return null;
+        const u = (i + 0.5) / P; let acc = 0;
+        for (const k of recipe.kinds) { acc += k.frac; if (u <= acc) return k; }
+        return recipe.kinds[recipe.kinds.length - 1];
       };
-
+      const spawn = (p, fresh) => {
+        const k = p.kind;
+        if (k) { const q = spawnPos(k, rng); p.x = q[0]; p.y = fresh ? q[1] : q[1]; const lo = k.life[0], hi = k.life[1]; p.life = lo + (rng() * (hi - lo) | 0); }
+        else { p.x = rng(); p.y = fresh ? rng() : 1.05; p.life = 140 + (rng() * 220 | 0); }
+        p.size = (small ? 1.1 : 1.5) + rng() * (small ? 1.6 : 2.4);
+        p.a0 = 0.18 + rng() * 0.34; p.aph = rng() * TAU; p.asp = 0.5 + rng() * 1.3;
+      };
       const baseCount = clamp(Math.round((img.naturalWidth || 1200) / 14), 36, 120);
       const P = small ? Math.round(baseCount * 0.55) : baseCount;
-      for (let i = 0; i < P; i++) { const p = {}; spawn(p, true); f.parts.push(p); }
+      for (let i = 0; i < P; i++) { const p = { kind: kindFor(i, P) }; spawn(p, true); f.parts.push(p); }
 
-      const resize = () => {
-        const r = canvas.getBoundingClientRect();
-        f.w = Math.max(1, r.width); f.h = Math.max(1, r.height);
-        canvas.width = Math.round(f.w * dpr); canvas.height = Math.round(f.h * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      };
-      resize();
-      window.addEventListener('resize', resize, { passive: true });
-
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver((es) => { f.vis = es[0].isIntersecting; }, { rootMargin: '180px' }).observe(canvas);
-      }
-
-      // Presence: motes lean gently toward the cursor when it's over the photo.
-      fig.addEventListener('pointermove', (e) => {
-        const r = canvas.getBoundingClientRect();
-        f.mouse = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
-      }, { passive: true });
+      const resize = () => { const r = canvas.getBoundingClientRect(); f.w = Math.max(1, r.width); f.h = Math.max(1, r.height); canvas.width = Math.round(f.w * dpr); canvas.height = Math.round(f.h * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+      resize(); window.addEventListener('resize', resize, { passive: true });
+      if ('IntersectionObserver' in window) new IntersectionObserver((es) => { f.vis = es[0].isIntersecting; }, { rootMargin: '180px' }).observe(canvas);
+      fig.addEventListener('pointermove', (e) => { const r = canvas.getBoundingClientRect(); f.mouse = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; }, { passive: true });
       fig.addEventListener('pointerleave', () => { f.mouse = null; });
-
       fields.push(f);
-      if (reduce && sampler) { stepDraw(f, 1.2); } // one quiet static frame
+      if (reduce && sampler) stepDraw(f, 1.2);
     }
 
     function stepDraw(f, t) {
-      const { ctx, w, h, sampler, parts } = f;
-      if (!sampler) return;
-      ctx.clearRect(0, 0, w, h);
-      ctx.globalCompositeOperation = 'lighter';
-      const speed = 0.0016;
+      const { ctx, w, h, sampler, parts } = f; if (!sampler) return;
+      ctx.clearRect(0, 0, w, h); ctx.globalCompositeOperation = 'lighter';
       for (const p of parts) {
-        const v = curl(p.x * 3, p.y * 3, t);
-        let vx = v[0], vy = v[1];
-        if (f.mouse) {
-          const mx = f.mouse[0] - p.x, my = f.mouse[1] - p.y;
-          const d2 = mx * mx + my * my;
-          if (d2 < 0.09) { const k = (0.09 - d2) / 0.09; vx += mx * 6 * k; vy += my * 6 * k; }
-        }
-        const m = Math.hypot(vx, vy) || 1;
-        p.x += speed * vx / m; p.y += speed * vy / m;
-        p.life--;
-        if (p.life <= 0 || p.x < -0.05 || p.x > 1.05 || p.y < -0.08 || p.y > 1.08) { spawn(p, false); continue; }
-
-        // edge fade so motes dissolve at the frame border
+        const k = p.kind; const speed = k ? k.speed : 0.0016;
+        const v = fieldVec(k || {}, p, t, sampler); let vx = v[0], vy = v[1];
+        if (f.mouse) { const mx = f.mouse[0] - p.x, my = f.mouse[1] - p.y, d2 = mx * mx + my * my; if (d2 < 0.09) { const g = (0.09 - d2) / 0.09; vx += mx * 6 * g; vy += my * 6 * g; } }
+        const m = Math.hypot(vx, vy) || 1; p.x += speed * vx / m; p.y += speed * vy / m; p.life--;
+        const reached = k && k.reach && k.field === 'toward' && Math.hypot(k.target[0] - p.x, k.target[1] - p.y) < k.reach;
+        if (p.life <= 0 || reached || p.x < -0.06 || p.x > 1.06 || p.y < -0.1 || p.y > 1.1) { spawn(p, false); continue; }
         const ef = clamp(Math.min(p.x, 1 - p.x) / 0.12, 0, 1) * clamp(Math.min(p.y, 1 - p.y) / 0.12, 0, 1);
-        let a = (p.a0 + 0.22 * Math.sin(t * p.asp + p.aph)) * ef;
-        if (f.mouse) a *= 1.25;
-        a = clamp(a, 0, 0.8);
+        let a = (p.a0 + 0.22 * Math.sin(t * p.asp + p.aph)) * ef; if (f.mouse) a *= 1.25; a = clamp(a, 0, 0.8);
         if (a < 0.012) continue;
-
-        const c = sampleColour(sampler, p.x, p.y);
-        // lift toward light so motes read as glints of the photo's own colour
-        const r = clamp(c[0] + 38, 0, 255), g = clamp(c[1] + 38, 0, 255), b = clamp(c[2] + 38, 0, 255);
+        const c = colourAt(sampler, p.x, p.y); const lift = (k && k.glow) || 38;
+        const r = clamp(c[0] + lift, 0, 255), g = clamp(c[1] + lift, 0, 255), b = clamp(c[2] + lift, 0, 255);
         const px = p.x * w, py = p.y * h, rad = p.size;
         const grd = ctx.createRadialGradient(px, py, 0, px, py, rad * 3.2);
-        grd.addColorStop(0, `rgba(${r},${g},${b},${a.toFixed(3)})`);
-        grd.addColorStop(1, `rgba(${r},${g},${b},0)`);
-        ctx.fillStyle = grd;
-        ctx.beginPath(); ctx.arc(px, py, rad * 3.2, 0, TAU); ctx.fill();
+        grd.addColorStop(0, `rgba(${r},${g},${b},${a.toFixed(3)})`); grd.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(px, py, rad * 3.2, 0, TAU); ctx.fill();
       }
       ctx.globalCompositeOperation = 'source-over';
     }
 
     let start = null, last = 0;
-    function loop(ts) {
-      if (start === null) start = ts;
-      if (ts - last >= 33) { last = ts; const t = (ts - start) / 1000; for (const f of fields) if (f.vis) stepDraw(f, t); }
-      requestAnimationFrame(loop);
-    }
-
-    function ready(img, cb) {
-      if (img.complete && img.naturalWidth) cb();
-      else img.addEventListener('load', cb, { once: true });
-    }
-
-    function init() {
-      const imgs = document.querySelectorAll('.essay-body img');
-      if (!imgs.length) return;
-      imgs.forEach((img) => ready(img, () => enhance(img)));
-      if (!reduce) requestAnimationFrame(loop);
-    }
-    if (document.readyState !== 'loading') init();
-    else document.addEventListener('DOMContentLoaded', init);
+    function loop(ts) { if (start === null) start = ts; if (ts - last >= 33) { last = ts; const t = (ts - start) / 1000; for (const f of fields) if (f.vis) stepDraw(f, t); } requestAnimationFrame(loop); }
+    function ready(img, cb) { if (img.complete && img.naturalWidth) cb(); else img.addEventListener('load', cb, { once: true }); }
+    function init() { const imgs = document.querySelectorAll('.essay-body img'); if (!imgs.length) return; imgs.forEach((img) => ready(img, () => enhance(img))); if (!reduce) requestAnimationFrame(loop); }
+    if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
   })();
 </script>
