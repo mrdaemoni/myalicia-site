@@ -1,11 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
 import DrawingDance from '../../components/DrawingDance.astro';
+import { frontmatter as wb } from '../../essays/the-weather-between-us.md';
 import { frontmatter as ee } from '../../essays/emergence-vs-emergency.md';
 import { frontmatter as hp } from '../../essays/the-humorphic-partnership.md';
 
 // Newest first.
-const essays = [ee, hp];
+const essays = [wb, ee, hp];
 ---
 <Base
   title="Essays · My Alicia"
