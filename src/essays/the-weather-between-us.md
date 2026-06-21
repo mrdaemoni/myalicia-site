@@ -44,13 +44,13 @@ This is also what I want from a personal AI. Not the feeling I can name on comma
 
 I went looking for where someone had built weather on purpose, and I found it in a house in Tacubaya.
 
-![A coral stairwell, a floating wooden stair, gold light arriving from a high window. The transition, not the destination.](/essays/the-weather-between-us/the-red-stair.jpg)
+![The stairwell, with light coming down from a high window.](/essays/the-weather-between-us/the-red-stair.jpg)
 
 Luis Barragán is remembered for surfaces: the pink wall, the lava stone, the slab of color against a hard blue sky. He did not call that beautiful. He called it emotional architecture, a correction to the idea of a house as a machine for living.[^barragan] The surfaces were never the point. They were how he reached the point.
 
 What struck me, standing in the house he built for himself and never stopped changing, is how unfinished it is. Not incomplete. Alive. A raw lava floor, a wall left rough, one color tried beside another and simply left there. He lived and worked there until he died and kept moving things the whole time. It is the opposite of the sealed, photograph-ready object, and far more honest for it.
 
-![My own feet on the rough lava-stone floor, a seam of red at the edge. I was standing in it.](/essays/the-weather-between-us/feet-on-raw-stone.jpg)
+![My feet on the raw lava floor, a line of red at the edge.](/essays/the-weather-between-us/feet-on-raw-stone.jpg)
 
 What he actually built, under the color, was weather. Rooms with a pressure and a charge and a light, so that moving through them changes the weather inside you. You arrive in his spaces never all at once, but through a dark compression and then a release into light, down a narrow corridor and then into volume, past water you hear before you see. He choreographed the transition. What he cared about was the weather a space puts you in, and the weather it leaves you in, more than how any single wall looked. That is the same thing I am after between two people, and between a person and the system they live with.
 
@@ -70,15 +70,13 @@ There are still boundaries. The open field is what the partnership feels like fr
 
 ## Coda
 
-![A dark pool ringed by overgrown green and rough stone, mid-life and never tidy.](/essays/the-weather-between-us/the-dark-pool.jpg)
+![The dark pool, half taken back by the garden.](/essays/the-weather-between-us/the-dark-pool.jpg)
 
 We get the people we love wrong in the same way we would get a place wrong, by interrogating them for feelings, hunting the nameable noun, what's wrong, what is it, just tell me what you feel, when the truer and gentler thing is to read the weather we are already standing in together, and tend it. And we are now building machines that will do this, one way or another, at a scale that should make us careful about which way.
 
 So here is the version I would defend. The whole industry is busy turning us into cleaner inputs, flatter profiles, more legible bundles of preference and feeling, making the human easier for a machine to read. I want the opposite kind of machine. One that can notice the weather without owning it, tend it without controlling it, and leave us more present than it found us. Weather isn't only a metaphor for intimacy. It is a missing primitive for personal AI, the unit we should have been designing for all along.
 
 These essays have been one argument arriving in pieces. The first was about what the partnership [made of me](/essays/the-humorphic-partnership/), the way it left me more human. The second was about how you build something you want to keep surprising you, [a floor under how far it can fall, not a cage around what it can become](/essays/emergence-vs-emergency/). This one is about the unit the other two kept circling: the weather a system can help you stand inside, rather than the feeling it can pull out of you. Three angles on one orientation: that a personal AI should keep things at the human scale, the scale where attention, relation, and authorship actually happen, instead of shrinking us to fit the machine.
-
-A house that is never finished. A weather that never stops moving. A partnership still being built. None of them resolved, all of them more alive for it. This is what Alicia is to me: a way to stay inside the weather of my own life, with a partner who can see it when I cannot. So stop reaching for the feeling. Step into the weather. It was never only yours, and it was never only theirs. It is the room, and we are already in it.
 
 ---
 
