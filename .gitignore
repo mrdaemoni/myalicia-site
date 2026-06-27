@@ -24,3 +24,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# stray editor/duplicate files
+*copy.md
+* copy.*
