@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import EssayArticle from '../../components/EssayArticle.astro';
+import { Content, frontmatter as fm } from '../../essays/the-cure-is-the-care.md';
+const canonical = `https://myalicia.com/essays/${fm.slug}/`;
+---
+<Base
+  title={`${fm.title} · My Alicia`}
+  description={fm.description}
+  canonical={canonical}
+  image={`/og/${fm.slug}.png`}
+  ogType="article"
+>
+  <p class="essay-back"><a href="/essays/">← All essays</a></p>
+  <EssayArticle fm={fm} Body={Content} />
+</Base>
