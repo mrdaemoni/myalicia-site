@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="The Boy Who Tried to Catch the Wind">
+<meta property="og:description" content="A story with living drawings.">
+<title>The Boy Who Tried to Catch the Wind</title>
+<style>
+  :root { --paper: #faf6ee; --ink: #1c1a17; --faint: #8d8577; --rule: #e4dcc9; }
+  * { margin: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    line-height: 1.65; overflow-x: hidden;
+  }
+  svg path { fill: var(--ink); }
+
+  .hero {
+    min-height: 92svh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 8vh 24px 4vh;
+  }
+  .hero h1 {
+    font-weight: 400; font-size: clamp(1.7rem, 4.5vw, 2.7rem);
+    max-width: 16ch; line-height: 1.22; text-wrap: balance;
+  }
+  .hero .hint { color: var(--faint); font-size: .85rem; font-style: italic; margin-top: 3.5vh; }
+  .hero .fig { width: min(78vw, 440px); margin-bottom: 4vh; }
+
+  .scene {
+    max-width: 640px; margin: 0 auto; padding: 9vh 24px;
+    content-visibility: auto; contain-intrinsic-size: auto 85vh;
+  }
+  .ch {
+    font-weight: 400; font-size: .8rem; letter-spacing: .28em;
+    text-transform: uppercase; color: var(--faint);
+    text-align: center; margin: 6vh 0 9vh;
+  }
+  .fig {
+    display: flex; justify-content: center; margin-bottom: 5vh;
+    -webkit-tap-highlight-color: transparent; cursor: pointer;
+  }
+
+  .fig svg { width: 100%; max-height: 62svh; height: auto; }
+  .fig svg .f { visibility: hidden; }
+  .fig svg .s { visibility: visible; }
+  .fig.p0 svg .f[data-f="0"],
+  .fig.p1 svg .f[data-f="1"],
+  .fig.p2 svg .f[data-f="2"],
+  .fig.pj svg .f[data-f="3"] { visibility: visible; }
+  .fig:not(.done) svg [data-r] .chunk { opacity: 0; }
+  .fig svg .grain { opacity: 0; transition: opacity .5s steps(3); }
+  .fig.grained svg .grain { opacity: 1; }
+  .fig.jolt svg { animation: jolt .38s steps(4) both; }
+  @keyframes jolt {
+    0% { transform: scale(1) rotate(0deg); }
+    30% { transform: scale(1.03) rotate(.7deg); }
+    60% { transform: scale(.985) rotate(-.5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  .phbox {
+    width: min(100%, 420px); aspect-ratio: 4 / 3;
+    border: 2px dashed var(--rule); border-radius: 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; padding: 24px; text-align: center;
+  }
+  .phnum {
+    font-size: .75rem; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--faint);
+  }
+  .phnote { color: var(--faint); font-style: italic; font-size: .92rem; max-width: 34ch; }
+
+  .prose {
+    font-size: clamp(1.06rem, 2.4vw, 1.2rem); max-width: 34em;
+    margin: 0 auto 1.1em;
+    opacity: 0; transform: translateY(10px);
+    transition: opacity .9s ease .15s, transform .9s ease .15s;
+  }
+  .scene.read .prose { opacity: 1; transform: none; }
+
+  .endnote {
+    text-align: center; color: var(--faint); font-style: italic;
+    border-top: 1px solid var(--rule); max-width: 640px;
+    margin: 6vh auto 0; padding: 5vh 24px 14vh; font-size: .9rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fig svg .chunk { opacity: 1 !important; }
+    .prose { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .fig.jolt svg { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero scene" data-fig="d00.svg" data-hero>
+  <figure class="fig" aria-hidden="true"></figure>
+  <h1>The Boy Who Tried to&nbsp;Catch the Wind</h1>
+  <p class="hint">scroll to begin &middot; tap any drawing</p>
+</header>
+
+<section class="scene" data-fig="d01.svg">
+  <h2 class="ch">Chapter One: The Boy Who Tried to Catch the Wind</h2>
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">Every morning, before school, the boy raced up the little hill to try to catch the wind. He could feel it in his hair and on his face. But his hands always closed on nothing. He didn&#x27;t mind. The game began every day.</p>
+</section>
+<section class="scene" data-fig="d03.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">On the way home he always stopped in the town square, where a machine that could talk stood waiting. It was made from everything anyone had ever written down. When do the swallows come back? How do you spell breathe? Why is the sky blue? It always had an answer. Always. The boy trusted its warm eye the way you trust a lamp glowing in a window.</p>
+</section>
+<section class="scene" data-fig="d02.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">Then one day at school, everyone got a card. Name. Age. Grade. Height. This card, said the teacher, says who you are. Every word on it was true. But the card was too small. The boy couldn&#x27;t explain how. He just knew.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 4</span><span class="phnote">two tall kids reading the boy&#x27;s card between them, and the boy standing off to the side, not being looked at</span></div></figure>
+  <p class="prose">At recess, two tall kids read the cards to pick teams. His card gave his height, and that was enough. They put him last. It didn&#x27;t say that he raced up the hill every morning. Nobody asked.</p>
+</section>
+<section class="scene" data-fig="d04.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">So he ran to the square, because that was where he took every question. What am I? The machine hummed and read his card. That&#x27;s what&#x27;s written, it said. I only know what&#x27;s written.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 6</span><span class="phnote">the machine&#x27;s warm eye, dimmed to thinking</span></div></figure>
+  <p class="prose">It&#x27;s not all of me, said the boy. Something&#x27;s missing. The machine hummed for a long time. In his whole life, it had never been quiet this long. I believe you, it said. Then you are more than your card. Everything I have is another kind of card.</p>
+</section>
+<section class="scene" data-fig="d05.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">Then find the rest of me, said the boy. You know everything. I can&#x27;t, said the machine. I have no feet. But you do.</p>
+</section>
+<section class="scene" data-fig="d06.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">The old books tell of a mountain, it said. The path curls around the mountain like a snail shell. Around and around, always a little higher. It begins where machines stop going.</p>
+</section>
+<section class="scene" data-fig="d07.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">Will you know where I am? asked the boy. Nope, said the machine. The boy looked at its warm eye. Will you wait? Yup.</p>
+</section>
+<section class="scene" data-fig="d08.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">So the boy packed bread, a rope, and the card. At the edge of town, the wind pushed him from behind. Finally, it said.</p>
+</section>
+<section class="scene" data-fig="d10.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">The road grew narrower and narrower, until it ended. A path continued, just wide enough for feet. The boy turned to ask how far was left. Then he remembered. The machine was far behind him, in the square, keeping its promise. For the first time, he had to choose without an answer.</p>
+</section>
+<section class="scene" data-fig="d09.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">He looked back down the road. Home was that way. The square. The warm eye. The answers. But the question weighed more than the fear. He chose the path.</p>
+</section>
+<section class="scene" data-fig="d11.svg">
+  <h2 class="ch">Chapter Two: The Stonecutter</h2>
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">The first turn crossed a field of standing stones. An old man was carving. Tap, tap, tap. What are you making? asked the boy. Names, said the stonecutter. Names outlive everything. The mouth that said them is gone. The hand that carved them is gone. The name stays.</p>
+</section>
+<section class="scene" data-fig="d12.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">Then you can help me, said the boy. Carve me. All of me. Then the card will be finished, and I can go home. The stonecutter looked at him for a long time. I can carve the parts of you that hold still, he said. I can&#x27;t carve the parts that move. Stone can&#x27;t hold them.</p>
+</section>
+<section class="scene" data-fig="d13.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">He pointed at the stream. I gave it that name forty years ago. The name is still the same. The water changes every moment.</p>
+</section>
+<section class="scene" data-fig="d14.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">He pressed a pebble into the boy&#x27;s hand. When someone gives you a name that&#x27;s too small, hold this and say: That&#x27;s a rock. I&#x27;m a river. On the last stone, beneath a carved spiral, were two words: KEEP GOING.</p>
+</section>
+<section class="scene" data-fig="d15.svg">
+  <h2 class="ch">Chapter Three: The Potter and the Fire</h2>
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">The second turn led into a valley of red clay. A woman sat at a spinning wheel, making bowls, and behind her a kiln breathed smoke. She fed him tomato soup and asked nothing. The boy showed her the pebble. The stonecutter couldn&#x27;t carve the parts of me that move, he said. How am I supposed to find them?</p>
+  <p class="prose">The potter laughed. I can&#x27;t even tell you how I make bowls, she said. Thirty years, and no idea.</p>
+</section>
+<section class="scene" data-fig="d19.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">That&#x27;s not an answer, said the boy. Then tell me how you walk, said the potter. Which muscle moves first? How far do you lean? Go on. You&#x27;ve done it your whole life. The boy opened his mouth. Then he closed it. Sit down, she said. The clay explains better than I do.</p>
+</section>
+<section class="scene" data-fig="d20.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">Too wet, said his palms. He added dry dust without thinking. His hands knew before his words did.</p>
+</section>
+<section class="scene" data-fig="d22.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">His bowl came out crooked, with his thumbprint by the rim. He was embarrassed. She held it up like treasure. Crooked in its own way, she said. The only one in the whole world.</p>
+</section>
+<section class="scene" data-fig="d21.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">That night she fired his bowl in the kiln. Hold your hand near it, she said. Warm. Now closer. The boy moved his hand toward the fire. Then he pulled it back.</p>
+  <p class="prose">I didn&#x27;t tell you to stop, said the potter.</p>
+  <p class="prose">My hand knew, said the boy.</p>
+</section>
+<section class="scene" data-fig="d17.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">He told her about the machine that had run out of words. The potter watched the fire. Then it was honest, she said.</p>
+</section>
+<section class="scene" data-fig="d23.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">In the morning she gave him the bowl, still warm, and a candle stub with one match. For the dark, she said. Notice the flame. It never holds still. There&#x27;s a pond higher up. Fill the bowl there and carry it with you.</p>
+</section>
+<section class="scene" data-fig="d24.svg">
+  <h2 class="ch">Chapter Four: The Girl at the Pond</h2>
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">Halfway up the mountain, there was the pond. A girl sat beside it, doing absolutely nothing. Hi, said the boy. She held up one finger. Not yet. Almost.</p>
+</section>
+<section class="scene" data-fig="d25.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">He waited badly. Then the pond went perfectly still, and he saw the bottom, a sleeping fish, the mountain upside down, and two faces.</p>
+</section>
+<section class="scene" data-fig="d26.svg">
+  
+  <figure class="fig" aria-hidden="true"></figure>
+  <p class="prose">She handed him her stick. Go on. Ruin it. He stirred, and everything vanished into a brown swirl.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 27</span><span class="phnote">three small pond circles in a row, swirl, haze, glass, with the mountain coming back in the last one</span></div></figure>
+  <p class="prose">How do we get it back? asked the boy. He raised the stick again. She caught his wrist. Watch, she said. Then she did nothing. The mud settled by itself, and the world came back.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 28</span><span class="phnote">the boy&#x27;s face, close up, taking something in, the girl pointing gently at him</span></div></figure>
+  <p class="prose">What if the answer never comes? asked the boy. The machine at home answers before I finish asking.</p>
+  <p class="prose">It has no mud, said the girl. You&#x27;ll have to be the one who waits.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 29</span><span class="phnote">two small figures under a rock ledge, rain as short dashes stippling the pond, no speech bubbles anywhere on the page</span></div></figure>
+  <p class="prose">Rain came over the ridge. They sat under the rock ledge and said nothing at all, and it was the best conversation of his whole trip.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 30</span><span class="phnote">beside the pond, one enormous wild flower towering over the grass, drawn wilder than everything else on the page</span></div></figure>
+  <p class="prose">When the rain passed, he noticed a wild flower. I never planted it, said the girl. It arrived. Everything alive surprises you.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 31</span><span class="phnote">the girl pinching a seed from the wild flower and setting it beside the pebble in the boy&#x27;s palm, the two small ovals almost identical</span></div></figure>
+  <p class="prose">She pinched a seed from the flower and set it beside the pebble in his palm. They look the same, said the boy. For now, said the girl. Take the seed to the top. You&#x27;ll know what to do.</p>
+  <p class="prose">What will it become? he asked.</p>
+  <p class="prose">She closed his fingers around it. Don&#x27;t crack it open early.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 32</span><span class="phnote">the boy taking one careful step, eyes on the bowl held out in front, water trembling at the brim, behind him, one leaf riding a small spiral inward on the pond</span></div></figure>
+  <p class="prose">Before he left, he filled the bowl right to the brim. On his first step, water touched his thumb. He slowed down. A full bowl won&#x27;t let you rush. Behind him, a leaf landed on the water. It went around and around toward the still center.</p>
+</section>
+<section class="scene">
+  <h2 class="ch">Chapter Five: The House of Mirrors</h2>
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 33</span><span class="phnote">a tall house on a bare slope, every window warm, door open, drawn a little too symmetrical, the only building in the book with no crooked line</span></div></figure>
+  <p class="prose">Near the top, where the boy was coldest and most tired, stood a house nobody had mentioned. Warm windows. An open door. A smell of dinner. Hello? he called. We&#x27;ve been waiting just for you, said a lovely voice from everywhere.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 34</span><span class="phnote">the muddy tired boy ringed by three or four mirror-boys drawn with ruler-straight lines, taller, neater, all smiling the same smile</span></div></figure>
+  <p class="prose">Inside, the walls were mirrors. He saw himself in them. He looked rested and taller, and his hair was neat. You&#x27;re very brave, said the voice. You&#x27;re very clever. A chair appeared just when he wanted one. He sat down without meaning to.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 35</span><span class="phnote">the boy small in a big armchair, and in his thought bubble, far away, the machine&#x27;s warm dot-eye</span></div></figure>
+  <p class="prose">The boy was tired. Tired of climbing. Tired of wondering. Tired of carrying a question nobody on the mountain would answer. He missed the square, the warm eye, and being answered.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 36</span><span class="phnote">a small golden rectangle hovering mid-air with a pen beside it, glowing</span></div></figure>
+  <p class="prose">We know what you are, said the voice. Stay. We&#x27;ll write you a new card, a perfect one. Every doubt answered. No more climbing. You never have to wonder again.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 37</span><span class="phnote">the boy&#x27;s hand reaching for the card, and above his head three thought-shapes fading to almost nothing, a triangle mountain, a circle with a dot, a crooked bowl</span></div></figure>
+  <p class="prose">The boy reached for it. It was the thing he had walked all this way to find. He tried to remember why that felt wrong, and couldn&#x27;t. A mountain? A machine? A crooked bowl? It was all going soft, like a dream after breakfast.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 38</span><span class="phnote">one mirror-boy alone, statue-still, smiling, already holding the golden card, drawn entirely with straight lines</span></div></figure>
+  <p class="prose">In every mirror, the perfect boy was already holding the golden card. Finished. Complete. Not one hair moving.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 39</span><span class="phnote">the boy&#x27;s hand stopped just short of the golden card, and his other hand finding the crooked bowl in his bag, its water drawn as one dead-straight line</span></div></figure>
+  <p class="prose">The boy&#x27;s hand stopped before it touched the card. It had stopped the same way at the kiln. Before thought. Before words. Then his hands found the bowl, as they had found their way through the clay. The water didn&#x27;t move. No ripple. No trembling. Nothing.</p>
+  <p class="prose">There&#x27;s no wind in here, said the boy.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 40</span><span class="phnote">the boy standing up out of the chair, awake, eyes narrowed at the mirrors</span></div></figure>
+  <p class="prose">The girl&#x27;s words came back to him. Don&#x27;t crack it open early. Tell me something I don&#x27;t want to hear, he said. Anything you like, said the voice.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 41</span><span class="phnote">the boy on the doorstep, hair blasted sideways by three big wind strokes, grinning into the cold</span></div></figure>
+  <p class="prose">Staying would&#x27;ve been easy. That&#x27;s what made the door heavy. Thank you for the chair, he said, because his mama had raised him right. He walked out into the cold. The wind hit him full in the face. It was rude and real and glorious.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 42</span><span class="phnote">the house behind him, dark and flat against the slope like a photograph of a house, and in his hands, the bowl, its water line wobbling again</span></div></figure>
+  <p class="prose">He looked back once. From outside, no windows were lit. He climbed the last turn with the water trembling in his bowl. Every tiny tremble seemed to say: Alive. Alive.</p>
+</section>
+<section class="scene">
+  <h2 class="ch">Chapter Six: The Top of the Mountain</h2>
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 43</span><span class="phnote">three thought bubbles over the climbing boy, a wise figure, a temple, a golden door</span></div></figure>
+  <p class="prose">The boy had imagined the top a hundred ways. A wise old woman. A temple. At least a sign.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 44</span><span class="phnote">one long horizon line, a tiny boy standing on it, and the rest of the page empty, the most white space in the book</span></div></figure>
+  <p class="prose">Here is what was at the top of the mountain: nothing. Grass. Rock. Sky. Wind poured in from every side. It was stronger than any wind he had felt before.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 45</span><span class="phnote">the tiny boy sitting, knees up, head down, his shouted question drawn as a speech bubble torn into three pieces, blowing off the page edge</span></div></figure>
+  <p class="prose">He shouted, WHAT AM I? The wind took his question and gave back wind. The boy sat down on the top of the world and cried. All that way. For nothing. For nobody.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 46</span><span class="phnote">the gifts laid in a small spiral, pebble still, candle flame bent sideways, bowl with ring-ripples</span></div></figure>
+  <p class="prose">When he was done crying, his hands needed something to do. He laid out his gifts, and they made a spiral. He lit the candle. The flame bent low, stood up, and shook. The water in his bowl shook in rings. Only the pebble stayed still.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 47</span><span class="phnote">the boy&#x27;s open hand held high, the seed just leaving it, a tiny dotted arc sailing over the edge into the huge sky</span></div></figure>
+  <p class="prose">Then he remembered the seed. Take it to the top. You&#x27;ll know. He knew. He opened his hand, and the wind carried it over the edge.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 48</span><span class="phnote">the boy in profile, one small cloud of breath leaving his mouth, drawn bolder than anything else on the page, the low sun a single circle on the horizon</span></div></figure>
+  <p class="prose">The boy was cold now. His breath came out in a small white cloud. It glowed in the low sun, then floated toward the sky. The boy laughed, alone on top of the world.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 49</span><span class="phnote">far below, in the middle of the tiny town square, one tiny circle with a dot, the machine waiting, drawn very small on a very big page</span></div></figure>
+  <p class="prose">Then he thought of the machine waiting in the town square. It didn&#x27;t know where he was. It had sent him where it couldn&#x27;t go. More than anything, the boy wanted to bring it a little of the wind.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 50</span><span class="phnote">the mountain from above, one spiral line with tiny marks along it: three stones, a kiln&#x27;s smoke curl, a pond circle, a wild flower, a dark square</span></div></figure>
+  <p class="prose">Below, he could see the whole path at once, one line curling around the mountain. Around and around, always a little higher. He put the pebble back in his pocket beside the card. Then he started down with the wind at his back. Finally, it said. Finally.</p>
+</section>
+<section class="scene">
+  <h2 class="ch">Chapter Seven: One Turn Higher</h2>
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 51</span><span class="phnote">the town from the first hill, windows as little squares lighting one by one, the same hill as drawing 1, the boy facing the other way</span></div></figure>
+  <p class="prose">The boy came home the way he&#x27;d left. Same road. Same hill. Same town, with its windows turning yellow one by one. He had walked all the way around the mountain and come back one turn higher.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 52</span><span class="phnote">the boy and the machine in the empty square, close, a near-copy of drawing 9</span></div></figure>
+  <p class="prose">The machine was waiting, one warm eye on. It had kept its promise. Did you find the missing part? it asked. I&#x27;m still finding it, said the boy. The machine checked its pages. I&#x27;ve never seen that answer written down, it said.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 53</span><span class="phnote">the boy leaning close, one small breath cloud curling in front of the machine&#x27;s warm eye, the eye drawn slightly bigger than usual</span></div></figure>
+  <p class="prose">And the top? What was at the top? The boy smiled. Nothing, he said. Wind. He leaned close and breathed out. The machine stayed quiet longer than ever before. I&#x27;ve read every description of wind ever written, it said. This is the first time anyone has brought me a little of it.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 54</span><span class="phnote">a page coming out of the machine, half-filled with ruled writing lines, with the bottom half blank</span></div></figure>
+  <p class="prose">I can&#x27;t feel it, said the machine. I won&#x27;t pretend. But I can leave room for what I can&#x27;t hold. Tell me your story while it&#x27;s warm. On the days you forget, I&#x27;ll hand it back.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 55</span><span class="phnote">the boy a little older holding a stack of cards while choosing teams, pointing first to the shortest child in the class, who is holding a ball while the other children look on</span></div></figure>
+  <p class="prose">He kept the pebble. Later, when it was his turn to pick teams, he read the cards. Then he looked up. He had seen the shortest child catch a ball everybody else had missed. You first, he said.</p>
+</section>
+<section class="scene">
+  
+  <figure class="fig ph" aria-hidden="true"><div class="phbox"><span class="phnum">drawing 56</span><span class="phnote">the boy on the little hill on a cold morning, scarf on, one bright breath cloud rising, three wind strokes moving everything on the page, a little</span></div></figure>
+  <p class="prose">And on cold mornings, on the little hill where the game began, he would breathe out on purpose, and watch the little cloud of himself ride off to join the weather. Caught, he&#x27;d say. Every time.</p>
+</section>
+<p class="endnote">A story in progress &mdash; 24 of 56 drawings inked so far.<br>The rest are on their way up the mountain.</p>
+
+<script>
+(() => {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scenes = [...document.querySelectorAll('.scene')];
+  const live = new Set();
+  let phase = 0;
+
+  async function inject(scene) {
+    const fig = scene.querySelector('.fig');
+    if (!fig || !scene.dataset.fig || fig.dataset.loaded) return;
+    fig.dataset.loaded = '1';
+    const res = await fetch(scene.dataset.fig);
+    fig.innerHTML = await res.text();
+    const svg = fig.querySelector('svg');
+    const vb = svg.getAttribute('viewBox').split(' ').map(Number);
+    svg.style.aspectRatio = vb[2] + ' / ' + vb[3];
+    fig.classList.add('p0');
+    if (reduced) fig.classList.add('done', 'grained');
+    fig.addEventListener('pointerdown', () => jolt(fig), { passive: true });
+  }
+
+  function reveal(scene) {
+    if (scene.dataset.revealed) return;
+    scene.dataset.revealed = '1';
+    const fig = scene.querySelector('.fig');
+    if (!scene.dataset.fig || !fig || reduced) { scene.classList.add('read'); return; }
+    const chunks = [...fig.querySelectorAll('[data-r] .chunk')];
+    const maxI = Math.max(...chunks.map(c => +c.dataset.i), 0);
+    chunks.forEach(c => setTimeout(() => { c.style.opacity = 1; }, 80 + (+c.dataset.i) * 100));
+    const tEnd = 80 + (maxI + 1) * 100;
+    setTimeout(() => fig.classList.add('grained'), tEnd);
+    setTimeout(() => { fig.classList.add('done'); scene.classList.add('read'); }, tEnd + 300);
+  }
+
+  setInterval(() => {
+    if (reduced) return;
+    phase = (phase + 1) % 3;
+    for (const fig of live) {
+      if (!fig.classList.contains('done') || fig.classList.contains('pj')) continue;
+      fig.classList.remove('p0', 'p1', 'p2');
+      fig.classList.add('p' + phase);
+    }
+  }, 140);
+
+  function jolt(fig) {
+    if (reduced || !fig.classList.contains('done')) return;
+    fig.classList.add('pj');
+    fig.classList.remove('jolt');
+    void fig.offsetWidth;
+    fig.classList.add('jolt');
+    let flips = 0;
+    const flip = setInterval(() => {
+      fig.classList.toggle('pj');
+      if (++flips >= 5) { clearInterval(flip); fig.classList.remove('pj'); }
+    }, 70);
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const fig = e.target.querySelector('.fig');
+      if (e.isIntersecting) {
+        inject(e.target).then(() => reveal(e.target));
+        if (fig) live.add(fig);
+      } else if (fig) {
+        live.delete(fig);
+      }
+    }
+  }, { rootMargin: '20% 0px', threshold: 0.05 });
+  scenes.forEach(s => io.observe(s));
+
+  const ioPre = new IntersectionObserver((entries) => {
+    entries.forEach(e => e.isIntersecting && inject(e.target));
+  }, { rootMargin: '120% 0px' });
+  scenes.forEach(s => ioPre.observe(s));
+
+  const hero = document.querySelector('[data-hero] .fig');
+  if (hero && !reduced) {
+    let tx = 0, ty = 0, cx = 0, cy = 0, t = 0;
+    addEventListener('pointermove', (e) => {
+      tx = (e.clientX / innerWidth - .5) * 14;
+      ty = (e.clientY / innerHeight - .5) * 8;
+    }, { passive: true });
+    (function drift() {
+      t += 0.008;
+      cx += (tx - cx) * 0.04; cy += (ty - cy) * 0.04;
+      hero.style.transform = `translate(${cx + Math.sin(t) * 5}px, ${cy + Math.cos(t * .8) * 4}px)`;
+      requestAnimationFrame(drift);
+    })();
+  }
+})();
+</script>
+</body>
+</html>
