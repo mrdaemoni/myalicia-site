@@ -28,3 +28,9 @@ Thumbs.db
 # stray editor/duplicate files
 *copy.md
 * copy.*
+
+# local-only secrets for `wrangler pages dev`
+.dev.vars
+
+# wrangler local state
+.wrangler/
